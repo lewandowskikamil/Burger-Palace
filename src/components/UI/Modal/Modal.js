@@ -18,6 +18,7 @@ const Modal = ({ children, show, modalClosed }) => {
     );
 }
 const areEqual = (prevProps, nextProps) => (
-    prevProps.show === nextProps.show
+    prevProps.show === nextProps.show &&
+    prevProps.children === nextProps.children
 )
 export default React.memo(Modal, areEqual);

@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+import axios from '../../axios-orders';
 import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
-import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary'
+import Spinner from '../../components/UI/Spinner/Spinner';
+import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
+import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 
 const INGREDIENTS_PRICES = {
     salad: 0.5,
@@ -13,18 +16,45 @@ const INGREDIENTS_PRICES = {
 
 class BurgerBuilder extends Component {
     state = {
-        ingredients: {
-            salad: 0,
-            bacon: 0,
-            cheese: 0,
-            meat: 0,
-        },
+        ingredients: null,
         totalPrice: 4,
         purchasable: false,
-        purchasing: false
+        purchasing: false,
+        loading: false,
+        error: null
     }
     purchaseHandler = (purchasing) => {
         this.setState({ purchasing })
+    }
+    purchaseContinueHandler = () => {
+        // console.log('continue')
+        // .json extension added for the firebase to function correctly
+        this.setState({ loading: true })
+        const order = {
+            ingredients: this.state.ingredients,
+            price: this.state.totalPrice,
+            customer: {
+                name: 'Peter Pan',
+                address: {
+                    street: 'FakeStreet 1',
+                    zipCode: '22222',
+                    country: 'Neverland'
+                },
+                email: 'peterpan@fakemail.com'
+            },
+            deliveryMethod: 'slowest possible'
+            // in production total price should be calculated at server side in order to prevent any manipulation from the client side
+
+        }
+        axios.post('/orders.json', order)
+            .then(res => {
+                this.setState({ purchasing: false, loading: false })
+                //for a fraction of a second you can see order summary before modal disappears
+            })
+            .catch(err => {
+                this.setState({ purchasing: false, loading: false })
+            })
+
     }
     updatePurchaseState = (ingredients) => {
         const sum = Object.keys(ingredients)
@@ -48,38 +78,94 @@ class BurgerBuilder extends Component {
         })
         this.updatePurchaseState(updatedIngredients);
     }
+    componentDidMount() {
+        axios.get('/ingredients.json')
+            .then(res => {
+                this.setState({
+                    ingredients: res.data
+                })
+            })
+            .catch(err => {
+                this.setState({ error: true })
+            })
+    }
     render() {
-        const { ingredients, totalPrice, purchasable } = this.state;
+        const { ingredients, totalPrice, purchasable, loading, error } = this.state;
         const disabledInfo = {
             ...ingredients
         }
         for (let key in disabledInfo) {
             disabledInfo[key] = !Boolean(disabledInfo[key])
         }
+        let orderSummary = null;
+        let burger = error ? (
+            <p
+                style={{
+                    padding: '10px',
+                    textAlign: 'center'
+                }}
+            >
+                Sorry, at the moment ingredients can't be loaded. Please, try again later.
+            </p>
+        ) : (
+                <div
+                    style={{
+                        height: '80vh',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
+                >
+                    <Spinner />
+                </div>
+            )
+        if (ingredients) {
+            orderSummary = (
+                <OrderSummary
+                    ingredients={ingredients}
+                    canceled={() => this.purchaseHandler(false)}
+                    continued={this.purchaseContinueHandler}
+                    price={totalPrice}
+                />
+            )
+            burger = (
+                <>
+                    <Burger ingredients={ingredients} />
+                    <BuildControls
+                        ingredientChanged={this.changeIngredientAmount}
+                        disabled={disabledInfo}
+                        price={totalPrice}
+                        purchasable={purchasable}
+                        purchased={() => this.purchaseHandler(true)}
+                    />
+                </>
+            )
+        }
+        if (loading) orderSummary = (
+            <div
+                style={{
+                    height: '100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}
+            >
+                <Spinner />
+            </div>
+        )
+
         return (
             <>
                 <Modal
                     show={this.state.purchasing}
                     modalClosed={() => this.purchaseHandler(false)}
                 >
-                    <OrderSummary
-                        ingredients={ingredients}
-                        canceled={() => this.purchaseHandler(false)}
-                        continued={() => console.log('redirect')}
-                        price={totalPrice}
-                    />
+                    {orderSummary}
                 </Modal>
-                <Burger ingredients={ingredients} />
-                <BuildControls
-                    ingredientChanged={this.changeIngredientAmount}
-                    disabled={disabledInfo}
-                    price={totalPrice}
-                    purchasable={purchasable}
-                    purchased={() => this.purchaseHandler(true)}
-                />
+                {burger}
             </>
         );
     }
 }
 
-export default BurgerBuilder;
+export default withErrorHandler(BurgerBuilder, axios);
