@@ -4,12 +4,14 @@ import Modal from '../../components/UI/Modal/Modal';
 
 const withErrorHandler = (WrappedComponent, axios) => {
     return class extends Component {
-        constructor(props) {
-            super(props);
-            // Nie wywołuj tutaj this.setState()!
-            this.state = {
-                error: null
-            }
+        state = {
+            error: null,
+            interceptorsSet: false
+        }
+        errorConfirmedHandler = () => {
+            this.setState({ error: null })
+        }
+        componentDidMount() {
             this.reqInterceptor = axios.interceptors.request.use(req => {
                 this.setState({ error: null })
                 return req
@@ -17,9 +19,7 @@ const withErrorHandler = (WrappedComponent, axios) => {
             this.resInterceptor = axios.interceptors.response.use(res => res, error => {
                 this.setState({ error })
             })
-        }
-        errorConfirmedHandler = () => {
-            this.setState({ error: null })
+            this.setState({ interceptorsSet: true })
         }
         componentWillUnmount() {
             //preventing memory leaks on unmounting (that could potentially become an issue after implementing routing)
@@ -28,7 +28,8 @@ const withErrorHandler = (WrappedComponent, axios) => {
 
         }
         render() {
-            return (
+            let content = null;
+            if (this.state.interceptorsSet) content = (
                 <>
                     <Modal
                         show={this.state.error}
@@ -39,6 +40,7 @@ const withErrorHandler = (WrappedComponent, axios) => {
                     <WrappedComponent {...this.props} />
                 </>
             )
+            return content
         }
     }
 }

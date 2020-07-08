@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './BuildControl.module.css';
 
-const BuildControl = ({ label, ingredientChanged, type, disabled }) => {
+const BuildControl = ({ label, ingredientAdded, ingredientRemoved, type, disabled }) => {
     return (
         <div className={styles.buildControl}>
             <span className={styles.label}>
@@ -9,14 +9,14 @@ const BuildControl = ({ label, ingredientChanged, type, disabled }) => {
             </span>
             <button
                 className={styles.less}
-                onClick={() => ingredientChanged(type, false)}
+                onClick={() => ingredientRemoved(type)}
                 disabled={disabled}
             >
                 Less
             </button>
             <button
                 className={styles.less}
-                onClick={() => ingredientChanged(type, true)}
+                onClick={() => ingredientAdded(type)}
             >
                 More
             </button>
