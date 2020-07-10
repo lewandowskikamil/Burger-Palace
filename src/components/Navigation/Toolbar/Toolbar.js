@@ -3,7 +3,7 @@ import styles from './Toolbar.module.css';
 import Logo from '../../Logo/Logo';
 import NavigationItems from '../NavigationItems/NavigationItems';
 import BurgerMenu from '../BurgerMenu/BurgerMenu';
-const Toolbar = ({ opened }) => {
+const Toolbar = ({ opened, isAuthed }) => {
     return (
         <header className={styles.toolbar}>
             <BurgerMenu
@@ -14,7 +14,7 @@ const Toolbar = ({ opened }) => {
                 <Logo />
             </div>
             <nav>
-                <NavigationItems />
+                <NavigationItems isAuthed={isAuthed} />
             </nav>
         </header>
     );

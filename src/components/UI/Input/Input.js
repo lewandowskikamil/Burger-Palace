@@ -60,7 +60,7 @@ const Input = ({
 
     }
     let errorMessage = null;
-    if (!valid && typeof (valid) === 'boolean' && touched) errorMessage = (
+    if (!valid && touched) errorMessage = (
         <span className={styles.errorMessage}>{validation.errorMessage}</span>
     )
     return (

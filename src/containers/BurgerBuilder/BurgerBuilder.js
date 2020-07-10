@@ -9,59 +9,29 @@ import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 import { connect } from 'react-redux';
 import * as actions from '../../store/actions';
 
-// const INGREDIENTS_PRICES = {
-//     salad: 0.5,
-//     bacon: 0.4,
-//     cheese: 1.3,
-//     meat: 0.7,
-// }
-
-class BurgerBuilder extends Component {
+export class BurgerBuilder extends Component {
     state = {
         purchasing: false
     }
     purchaseHandler = (purchasing) => {
-        this.setState({ purchasing })
+        const { isAuthed, history, onSetAuthRedirectPath } = this.props;
+        if (isAuthed) this.setState({ purchasing });
+        else {
+            onSetAuthRedirectPath('/checkout');
+            history.push('/auth');
+        }
     }
     purchaseContinueHandler = () => {
-        // console.log('continue')
-        // .json extension added for the firebase to function correctly
-
-        // const ingredients = Object.keys(this.state.ingredients)
-        //     .map(igKey => `${encodeURIComponent(igKey)}=${encodeURIComponent(this.state.ingredients[igKey])}`)
-        //     .join('&')
         const { history, onPurchaseInit } = this.props;
         onPurchaseInit();
         history.push('/checkout');
 
     }
-    // updatePurchaseState = (ingredients) => {
-    //     const sum = Object.keys(ingredients)
-    //         .map(igKey => ingredients[igKey])
-    //         .reduce((sum, el) => sum + el, 0)
-    //     this.setState({ purchasable: Boolean(sum) })
-    // }
-    // changeIngredientAmount = (type, isAmountIncreased) => {
-    //     const { ingredients, totalPrice } = this.state;
-    //     const ingrAmount = ingredients[type];
-    //     const updatedCount = isAmountIncreased ? ingrAmount + 1 : ingrAmount - 1
-    //     const updatedIngredients = {
-    //         ...ingredients,
-    //         [type]: updatedCount
-    //     }
-    //     const priceDiff = INGREDIENTS_PRICES[type];
-    //     const newTotalPrice = isAmountIncreased ? totalPrice + priceDiff : totalPrice - priceDiff;
-    //     this.setState({
-    //         ingredients: updatedIngredients,
-    //         totalPrice: newTotalPrice
-    //     })
-    //     this.updatePurchaseState(updatedIngredients);
-    // }
     componentDidMount() {
         this.props.onIngredientsInit()
     }
     render() {
-        const { ingredients, totalPrice, purchasable, onIngredientAdded, onIngredientRemoved, error } = this.props;
+        const { ingredients, totalPrice, purchasable, onIngredientAdded, onIngredientRemoved, error, isAuthed } = this.props;
         const disabledInfo = {
             ...ingredients
         }
@@ -105,28 +75,15 @@ class BurgerBuilder extends Component {
                     <BuildControls
                         ingredientAdded={onIngredientAdded}
                         ingredientRemoved={onIngredientRemoved}
-                        // adjust build controls comp to these two new methods
-                        // also adjust checkout since query params are no longer passed
                         disabled={disabledInfo}
                         price={totalPrice}
                         purchasable={purchasable}
                         purchased={() => this.purchaseHandler(true)}
+                        isAuthed={isAuthed}
                     />
                 </>
             )
         }
-        // if (loading) orderSummary = (
-        //     <div
-        //         style={{
-        //             height: '100%',
-        //             display: 'flex',
-        //             justifyContent: 'center',
-        //             alignItems: 'center'
-        //         }}
-        //     >
-        //         <Spinner />
-        //     </div>
-        // )
 
         return (
             <>
@@ -142,11 +99,12 @@ class BurgerBuilder extends Component {
     }
 }
 
-const mapStateToProps = ({ burger: { ingredients, totalPrice, purchasable, error } }) => ({
+const mapStateToProps = ({ burger: { ingredients, totalPrice, purchasable, error }, auth: { token } }) => ({
     ingredients,
     totalPrice,
     purchasable,
-    error
+    error,
+    isAuthed: !!token
 });
 const mapDispatchToProps = (dispatch) => ({
     onIngredientAdded: ingredientName => {
@@ -161,6 +119,9 @@ const mapDispatchToProps = (dispatch) => ({
     onPurchaseInit: () => {
         dispatch(actions.purchaseInit())
     },
+    onSetAuthRedirectPath: (path) => {
+        dispatch(actions.setAuthRedirectPath(path))
+    }
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(BurgerBuilder, axios));

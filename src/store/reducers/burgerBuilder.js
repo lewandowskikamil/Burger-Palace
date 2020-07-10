@@ -1,5 +1,5 @@
 import * as actionTypes from '../actions/actionTypes';
-import { updateObject } from '../utility';
+import { updateObject } from '../../shared/utility';
 
 const INGREDIENTS_PRICES = {
     salad: 0.5,
@@ -24,9 +24,9 @@ const changeIngredientAmount = (state, ingrName, isAdded) => {
     const updatedIngredients = updateObject(ingredients, updatedIngredient)
     const updatedPrice = isAdded ? price + ingrPrice : price - ingrPrice;
     const updatedPurchasable = !!Object.keys(updatedIngredients)
-        .map(igKey => ingredients[igKey])
+        .map(igKey => updatedIngredients[igKey])
         .reduce((sum, el) => sum + el, 0)
-
+    
     return updateObject(state, {
         ingredients: updatedIngredients,
         totalPrice: updatedPrice,
@@ -44,6 +44,9 @@ const burger = (state = initialState, action) => {
             return updateObject(state, {
                 ingredients: action.payload,
                 totalPrice: 4,
+                purchasable:!!Object.keys(action.payload)
+                .map(igKey => action.payload[igKey])
+                .reduce((sum, el) => sum + el, 0),
                 error: false
             });
         case actionTypes.FETCH_INGREDIENTS_FAILED:

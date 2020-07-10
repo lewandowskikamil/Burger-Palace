@@ -7,6 +7,7 @@ import axios from '../../../axios-orders';
 import { connect } from 'react-redux';
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 import * as actions from '../../../store/actions/';
+import { updateObject, checkValidity } from '../../../shared/utility';
 
 class ContactData extends Component {
     state = {
@@ -38,7 +39,8 @@ class ContactData extends Component {
                 value: '',
                 validation: {
                     required: true,
-                    errorMessage: 'This field cannot be empty.'
+                    errorMessage: 'It must be a valid email, don\'t fuck with me.',
+                    isEmail: true
                 },
                 valid: false,
                 touched: false
@@ -103,7 +105,10 @@ class ContactData extends Component {
                         { value: 'cheapest', displayValue: 'Cheapest' },
                     ]
                 },
-                value: 'cheapest'
+                value: 'cheapest',
+                validation: {},
+                valid: true,
+                touched: false
             },
         },
         isFormValid: false
@@ -119,45 +124,36 @@ class ContactData extends Component {
             ingredients: this.props.ingredients,
             price: this.props.totalPrice,
             orderData: formData,
+            userId: this.props.userId
             // in production total price should be calculated at server side in order to prevent any manipulation from the client side
         }
-        this.props.onOrderSubmit(order);
+        this.props.onOrderSubmit(order, this.props.token);
     }
     inputChangeHandler = (e) => {
-        const updatedOrderForm = {
-            ...this.state.orderForm
-        }
-        const updatedFormElement = {
-            ...updatedOrderForm[e.target.name]
-        }
-        updatedFormElement.value = e.target.value
-        updatedFormElement.valid = this.checkValidity(e.target.value, updatedFormElement.validation)
+        const { [e.target.name]: formElement } = this.state.orderForm;
+        const updatedFormElement = updateObject(formElement, {
+            value: e.target.value,
+            valid: checkValidity(
+                e.target.value, formElement.validation
+            ),
+        })
         if (!updatedFormElement.touched) updatedFormElement.touched = true
-        updatedOrderForm[e.target.name] = updatedFormElement
-        let isFormValid = true;
-        for (let inputIdentifier in updatedOrderForm) {
-            if (updatedOrderForm[inputIdentifier].valid === false && isFormValid) {
-                isFormValid = false
+        const updatedOrderForm = updateObject(this.state.orderForm, {
+            [e.target.name]: updatedFormElement
+        })
+        if (this.state.isFormValid === updatedFormElement.valid) {
+            this.setState({ orderForm: updatedOrderForm })
+        } else {
+            let isFormValid = true;
+            for (const inputIdentifier in updatedOrderForm) {
+                if (!updatedOrderForm[inputIdentifier].valid && isFormValid) {
+                    isFormValid = false
+                }
             }
+            this.setState({ orderForm: updatedOrderForm, isFormValid });
         }
-
-        this.setState({ orderForm: updatedOrderForm, isFormValid });
     }
-    checkValidity(value, rules) {
-        let isValid = true;
-        if (!rules) return isValid;
-        if (rules.required) {
-            isValid = value.trim() !== '';
-        }
-        if (rules.minLength) {
-            isValid = value.trim().length >= rules.minLength && isValid;
-        }
-        if (rules.maxLength) {
-            isValid = value.trim().length <= rules.maxLength && isValid;
-        }
-
-        return isValid
-    }
+    
     render() {
         const { orderForm, isFormValid } = this.state;
         const formElementsArray = Object.keys(orderForm)
@@ -190,15 +186,17 @@ class ContactData extends Component {
         );
     }
 }
-const mapStateToProps = ({ burger: { ingredients, totalPrice }, order: { loading } }) => ({
+const mapStateToProps = ({ burger: { ingredients, totalPrice }, order: { loading }, auth: { token, userId } }) => ({
     ingredients,
     totalPrice,
-    loading
+    loading,
+    token,
+    userId
 });
 
 const mapDispatchToProps = dispatch => ({
-    onOrderSubmit: (orderData) => {
-        dispatch(actions.purchaseBurger(orderData))
+    onOrderSubmit: (orderData, token) => {
+        dispatch(actions.purchaseBurger(orderData, token))
     }
 })
 

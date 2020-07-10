@@ -5,7 +5,7 @@ import styles from './SideDrawer.module.css';
 import Backdrop from '../../UI/Backdrop/Backdrop';
 import Arrow from '../Arrow/Arrow';
 
-const SideDrawer = ({ closed, open }) => {
+const SideDrawer = ({ closed, open, isAuthed }) => {
     const attachedClasses = [styles.sideDrawer];
     if (open) attachedClasses.push(styles.open)
     else attachedClasses.push(styles.close)
@@ -22,8 +22,8 @@ const SideDrawer = ({ closed, open }) => {
                 <div className={styles.logo}>
                     <Logo />
                 </div>
-                <nav>
-                    <NavigationItems />
+                <nav onClick={closed}>
+                    <NavigationItems isAuthed={isAuthed} />
                 </nav>
             </div>
         </>

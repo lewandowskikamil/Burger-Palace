@@ -8,7 +8,9 @@ import * as actions from '../../store/actions';
 
 class Orders extends Component {
     componentDidMount() {
-        this.props.onOrdersFetch();
+        const {onOrdersFetch, token, userId}=this.props;
+        onOrdersFetch(token, userId);
+        // alternatively, you could use getState in fetchOrders action creator
     }
     render() {
         const { loading, orders, error } = this.props;
@@ -28,10 +30,10 @@ class Orders extends Component {
         return displayedOrders;
     }
 }
-const mapStateToProps = ({ order: { loading, orders, error } }) => ({ loading, orders, error });
+const mapStateToProps = ({ order: { loading, orders, error }, auth:{token, userId} }) => ({ loading, orders, error, token, userId });
 
 const mapDispatchToProps = dispatch => ({
-    onOrdersFetch: () => dispatch(actions.fetchOrders())
+    onOrdersFetch: (token, userId) => dispatch(actions.fetchOrders(token, userId))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(Orders, axios));
