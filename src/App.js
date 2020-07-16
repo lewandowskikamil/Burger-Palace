@@ -1,4 +1,4 @@
-import React, { Component, Suspense, lazy } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { connect } from 'react-redux';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import Spinner from './components/UI/Spinner/Spinner';
@@ -12,37 +12,36 @@ const Logout = lazy(() => import('./containers/Auth/Logout/Logout'));
 
 
 
-class App extends Component {
-  componentDidMount() {
-    this.props.onTryAutoSignIn();
-  }
-  render() {
-    let routes = (
-      <Switch>
-        <Route path='/auth' component={Auth} />
-        <Route path='/' exact component={BurgerBuilder} />
-        <Redirect to='/' />
-      </Switch>
-    )
-    if (this.props.isAuthed) routes = (
-      <Switch>
-        <Route path='/checkout' component={Checkout} />
-        <Route path='/orders' component={Orders} />
-        <Route path='/logout' component={Logout} />
-        <Route path='/auth' component={Auth} />
-        <Route path='/' exact component={BurgerBuilder} />
-        <Redirect to='/' />
-      </Switch>
-    )
-    return (
-      <Layout>
-        <Suspense fallback={<div><Spinner></Spinner></div>}>
-          {routes}
-        </Suspense>
-      </Layout>
-    );
-  }
+const App = ({ onTryAutoSignIn, isAuthed }) => {
+  useEffect(() => {
+    onTryAutoSignIn();
+  }, [onTryAutoSignIn]);
+  let routes = (
+    <Switch>
+      <Route path='/auth' component={Auth} />
+      <Route path='/' exact component={BurgerBuilder} />
+      <Redirect to='/' />
+    </Switch>
+  )
+  if (isAuthed) routes = (
+    <Switch>
+      <Route path='/checkout' component={Checkout} />
+      <Route path='/orders' component={Orders} />
+      <Route path='/logout' component={Logout} />
+      <Route path='/auth' component={Auth} />
+      <Route path='/' exact component={BurgerBuilder} />
+      <Redirect to='/' />
+    </Switch>
+  )
+  return (
+    <Layout>
+      <Suspense fallback={<div><Spinner></Spinner></div>}>
+        {routes}
+      </Suspense>
+    </Layout>
+  );
 }
+
 const mapStateToProps = ({ auth: { token } }) => ({ isAuthed: !!token });
 
 const mapDispatchToProps = dispatch => ({
