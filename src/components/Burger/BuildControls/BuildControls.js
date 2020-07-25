@@ -28,7 +28,7 @@ const BuildControls = ({ ingredientAdded, ingredientRemoved, disabled, price, pu
                 disabled={!purchasable}
                 onClick={purchased}
             >
-                {isAuthed?'Order':'Sign in to order'}
+                Order
             </button>
         </div>
     );

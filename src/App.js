@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import Spinner from './components/UI/Spinner/Spinner';
 import Layout from './hoc/Layout/Layout';
+import About from './components/About/About';
 import * as actions from './store/actions';
 const BurgerBuilder = lazy(() => import('./containers/BurgerBuilder/BurgerBuilder'));
 const Checkout = lazy(() => import('./containers/Checkout/Checkout'));
@@ -19,6 +20,7 @@ const App = ({ onTryAutoSignIn, isAuthed }) => {
   let routes = (
     <Switch>
       <Route path='/auth' component={Auth} />
+      <Route path='/about' component={About} />
       <Route path='/' exact component={BurgerBuilder} />
       <Redirect to='/' />
     </Switch>
@@ -29,6 +31,7 @@ const App = ({ onTryAutoSignIn, isAuthed }) => {
       <Route path='/orders' component={Orders} />
       <Route path='/logout' component={Logout} />
       <Route path='/auth' component={Auth} />
+      <Route path='/about' component={About} />
       <Route path='/' exact component={BurgerBuilder} />
       <Redirect to='/' />
     </Switch>

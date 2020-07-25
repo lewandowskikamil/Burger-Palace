@@ -11,6 +11,11 @@ const NavigationItems = ({ isAuthed }) => {
             >
                 Burger Builder
             </NavigationItem>
+            <NavigationItem
+                link='/about'
+            >
+                About
+            </NavigationItem>
             {isAuthed ? (
                 <NavigationItem
                     link='/orders'
@@ -23,13 +28,13 @@ const NavigationItems = ({ isAuthed }) => {
                 <NavigationItem
                     link='/logout'
                 >
-                    Logout
+                    Sign Out
                 </NavigationItem>
             ) : (
                     <NavigationItem
                         link='/auth'
                     >
-                        Authenticate
+                        Sign In
                     </NavigationItem>
                 )
             }

@@ -53,11 +53,12 @@ const Auth = ({
     authRedirectPath,
     onSetAuthRedirectPath,
     loading,
-    error, isAuthed
+    error,
+    isAuthed
 }) => {
     const [formData, setFormData] = useState(initialFormData);
     const [isFormValid, setIsFormValid] = useState(false);
-    const [isSignUp, setIsSignUp] = useState(true);
+    const [isSignUp, setIsSignUp] = useState(false);
     const switchAuthModeHandler = () => {
         setIsSignUp(!isSignUp)
     }

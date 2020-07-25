@@ -105,14 +105,17 @@ const BurgerBuilder = ({
     );
 }
 
-const mapStateToProps = ({ burger: { ingredients, totalPrice, purchasable, error }, auth: { token } }) => ({
+const mapStateToProps = ({
+    burger: { ingredients, totalPrice, purchasable, error },
+    auth: { token }
+}) => ({
     ingredients,
     totalPrice,
     purchasable,
     error,
     isAuthed: !!token
 });
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
     onIngredientAdded: ingredientName => {
         dispatch(actions.addIngredient(ingredientName))
     },

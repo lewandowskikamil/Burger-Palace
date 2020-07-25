@@ -1,0 +1,25 @@
+.about {
+    /* margin-top: 20vh; */
+    text-align: justify;
+    color: white;
+    background: linear-gradient(#e07e41, #461b00);
+    /* width: 100%;
+    overflow: hidden;
+    max-height:calc(100vh - 72px); */
+    overflow: hidden;
+}
+
+.about h2 {
+    padding: 0 5vmax 2.5vmax 5vmax;
+    font-size: 30px;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.about p {
+    padding: 0 5vmax;
+}
+
+.about svg {
+    display: block;
+}

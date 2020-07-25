@@ -27,23 +27,6 @@ const initialFormData = {
         valid: false,
         touched: false
     },
-    email: {
-        elementType: 'input',
-        elementLabel: 'Email',
-        elementConfig: {
-            id: 'emailInput',
-            type: 'email',
-            placeholder: 'Your email'
-        },
-        value: '',
-        validation: {
-            required: true,
-            errorMessage: 'It must be a valid email, don\'t fuck with me.',
-            isEmail: true
-        },
-        valid: false,
-        touched: false
-    },
     street: {
         elementType: 'input',
         elementLabel: 'Street',
@@ -78,18 +61,21 @@ const initialFormData = {
         valid: false,
         touched: false
     },
-    country: {
+    phoneNumber: {
         elementType: 'input',
-        elementLabel: 'Country',
+        elementLabel: 'Phone number',
         elementConfig: {
-            id: 'countryInput',
+            id: 'phoneNumberInput',
             type: 'text',
-            placeholder: 'Country you live in'
+            placeholder: 'Your phone number'
         },
         value: '',
         validation: {
             required: true,
-            errorMessage: 'This field cannot be empty.'
+            isNumeric:true,
+            minLength: 9,
+            maxLength: 9,
+            errorMessage: 'Enter valid phone number - it should consist of 9 digits'
         },
         valid: false,
         touched: false
@@ -124,6 +110,7 @@ const ContactData = ({ ingredients, userId, totalPrice, onOrderSubmit, loading, 
             userId,
             ingredients,
             price: totalPrice,
+            orderDate:Date.parse(new Date()),
             orderData: fieldValues,
             // in production total price should be calculated at server side in order to prevent any manipulation from the client side
         }
@@ -178,7 +165,7 @@ const ContactData = ({ ingredients, userId, totalPrice, onOrderSubmit, loading, 
     if (loading) form = <Spinner />
     return (
         <div className={styles.contactData}>
-            <h2>Enter your contact data</h2>
+            <h2>Enter delivery data</h2>
             {form}
         </div>
     );

@@ -1,44 +1,60 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import Order from '../../components/Order/Order/Order';
+import OrderTable from '../../components/Order/OrderTable/OrderTable';
+import OrderFilters from '../../components/Order/OrderFilters/OrderFilters';
+import OrderStats from '../../components/Order/OrderStats/OrderStats';
 import axios from '../../axios-orders';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import * as actions from '../../store/actions';
+import styles from './Orders.module.css';
 
 const Orders = ({
     loading,
+    filteredOrders,
     orders,
+    orderStats,
     error,
     onOrdersFetch,
+    onFilterOrders,
     token,
     userId
 }) => {
     useEffect(() => {
         onOrdersFetch(token, userId);
-        // alternatively, you could use getState in fetchOrders action creator
     }, [onOrdersFetch, token, userId])
+
+    let ordersToShow = <p>There are no orders matching below filters.</p>;
+    let orderStatsToShow = <p>There are no stats to show.</p>;
+
+    if (filteredOrders.length) {
+        ordersToShow = <OrderTable orders={filteredOrders} />;
+        orderStatsToShow = <OrderStats orderStats={orderStats} />;
+    }
+
     let displayedOrders = orders.length ? (
-        <div>
-            {orders.map(({ id, ingredients, price }) => (
-                <Order
-                    key={id}
-                    ingredients={ingredients}
-                    price={+price}
-                />
-            ))}
+        <div className={styles.orders}>
+            <h2>Orders</h2>
+            {ordersToShow}
+            <OrderFilters onFilterOrders={onFilterOrders} />
+            {orderStatsToShow}
         </div>
-    ) : <p>There are no orders to display.</p>
+    ) : <p>There are no orders to show.</p>
+
     if (error) displayedOrders = <p>Something went wrong, please try again later.</p>
     if (loading) displayedOrders = <Spinner />
+
     return displayedOrders;
 }
+
 const mapStateToProps = ({
-    order: { loading, orders, error },
+    order: { loading, filteredOrders, orders, orderStats, error },
     auth: { token, userId }
 }) => ({
     loading,
+    filteredOrders,
     orders,
+    orderStats,
     error,
     token,
     userId
@@ -47,6 +63,9 @@ const mapStateToProps = ({
 const mapDispatchToProps = dispatch => ({
     onOrdersFetch: (token, userId) => {
         dispatch(actions.fetchOrders(token, userId))
+    },
+    onFilterOrders: (filters) => {
+        dispatch(actions.changeOrderFilters(filters))
     }
 })
 

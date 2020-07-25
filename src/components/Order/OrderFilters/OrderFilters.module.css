@@ -1,0 +1,24 @@
+.orderFilters {
+    margin: 20px auto;
+    width: 80%;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 3px #ccc;
+}
+.orderFilters h2{
+    margin: 20px 0;
+}
+
+.orderFilters form {
+    display: flex;
+    min-height: 200px;
+    justify-content:space-between;
+    flex-direction: column;
+}
+
+@media (min-width:600px) {
+    .orderFilters {
+        width: 500px;
+    }
+}

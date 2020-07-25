@@ -39,6 +39,13 @@ export const fetchOrdersFail = (error) => ({
     type: actionTypes.FETCH_ORDERS_FAIL,
     error
 })
+export const setFilteredOrders=(filteredOrders)=>({
+    type: actionTypes.SET_FILTERED_ORDERS,
+    filteredOrders
+})
+export const calculateOrderStats=()=>({
+    type:actionTypes.CALCULATE_ORDER_STATS
+})
 export const fetchOrders = (token, userId) => dispatch => {
     dispatch(fetchOrdersStart())
     const queryParams=`?auth=${token}&orderBy="userId"&equalTo="${userId}"`
@@ -49,8 +56,18 @@ export const fetchOrders = (token, userId) => dispatch => {
                 orders.push({ ...res.data[key], id: key })
             }
             dispatch(fetchOrdersSuccess(orders))
+            dispatch(setFilteredOrders(orders))
+            dispatch(calculateOrderStats())
         })
         .catch(err => {
             dispatch(fetchOrdersFail())
         })
+}
+export const filterOrders=(filters)=>({
+    type:actionTypes.FILTER_ORDERS,
+    filters
+})
+export const changeOrderFilters=filters=>dispatch=>{
+    dispatch(filterOrders(filters));
+    dispatch(calculateOrderStats())
 }

@@ -1,0 +1,36 @@
+.orderStats{
+    margin: 20px auto;
+    width: 80%;
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 3px #ccc;
+}
+.orderStats h2{
+    margin: 20px 0;
+}
+.orderStats p {
+    line-height: 200%;
+    text-align: left;
+}
+.orderStats span {
+    margin: 0 6px;
+}
+.orderStats ul {
+    text-align: left;
+    padding-left: 10px;
+    line-height: 200%;
+}
+.orderStats li {
+    display: flex;
+}
+.orderStats li span{
+    margin: 0;
+    width: 50px;
+}
+
+@media (min-width:600px) {
+    .orderStats {
+        width: 500px;
+    }
+}

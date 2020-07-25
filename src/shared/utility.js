@@ -23,7 +23,9 @@ export const checkValidity = (value, rules) => {
         const pattern = /^\d+$/;
         isValid = pattern.test(value) && isValid
     }
+    if (rules.isOptionalPrice) {
+        isValid = (+value > 4 || value === '') && isValid
+    }
 
     return isValid
 }
-// how to share stateful logic - for instance inputHandler
