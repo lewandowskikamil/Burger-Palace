@@ -6,15 +6,25 @@ const NavigationItems = ({ isAuthed }) => {
     return (
         <ul className={styles.navigationItems}>
             <NavigationItem
+                link='/about'
+            >
+                About
+            </NavigationItem>
+            <NavigationItem
+                link='/menu'
+            >
+                Menu
+            </NavigationItem>
+            <NavigationItem
                 link='/'
                 exact
             >
                 Burger Builder
             </NavigationItem>
             <NavigationItem
-                link='/about'
+                link='/cart'
             >
-                About
+                <span className="fa fa-shopping-cart" style={{fontSize:'26px'}}></span>
             </NavigationItem>
             {isAuthed ? (
                 <NavigationItem

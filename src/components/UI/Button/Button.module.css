@@ -1,28 +1,30 @@
-.button {
-    background-color: transparent;
-    border: none;
+.btn {
+    margin: 20px 0;
+    background-color: #703B09;
     color: white;
     outline: none;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
-    font: inherit;
-    padding: 10px;
-    margin: 10px;
-    font-weight: bold;
+    transition: background-color .3s ease-in-out, transform .2s ease-out;
 }
 
-.button:first-of-type {
-    margin-left: 0;
-    padding-left: 0;
-}
-.button:disabled{
-    color:#ccc;
-    cursor:not-allowed;
+.lg {
+    font-size: 18px;
+    padding: 10px 20px;
 }
 
-.success {
-    color: #5C9210;
+.sm {
+    font-size: 14px;
+    padding: 7px 14px;
 }
 
-.danger {
-    color: #944317;
+@media (min-width:1200px) {
+    .btn:hover {
+        background-color: #40a4c8;
+    }
+}
+
+.btn:active {
+    transform: scale(1.1);
 }

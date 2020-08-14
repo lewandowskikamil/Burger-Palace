@@ -1,7 +1,7 @@
 import * as actionTypes from '../actions/actionTypes';
 import { updateObject } from '../../shared/utility';
 
-const INGREDIENTS_PRICES = {
+export const INGREDIENTS_PRICES = {
     salad: 0.5,
     bacon: 0.4,
     cheese: 1.3,
@@ -9,10 +9,14 @@ const INGREDIENTS_PRICES = {
 }
 
 const initialState = {
-    ingredients: null,
+    ingredients: {
+        bacon: 0,
+        cheese: 0,
+        meat: 0,
+        salad: 0
+    },
     totalPrice: 4,
     purchasable: false,
-    error: false,
 }
 
 const changeIngredientAmount = (state, ingrName, isAdded) => {
@@ -26,7 +30,7 @@ const changeIngredientAmount = (state, ingrName, isAdded) => {
     const updatedPurchasable = !!Object.keys(updatedIngredients)
         .map(igKey => updatedIngredients[igKey])
         .reduce((sum, el) => sum + el, 0)
-    
+
     return updateObject(state, {
         ingredients: updatedIngredients,
         totalPrice: updatedPrice,
@@ -40,17 +44,8 @@ const burger = (state = initialState, action) => {
             return changeIngredientAmount(state, action.payload, true);
         case actionTypes.REMOVE_INGREDIENT:
             return changeIngredientAmount(state, action.payload, false);
-        case actionTypes.SET_INGREDIENTS:
-            return updateObject(state, {
-                ingredients: action.payload,
-                totalPrice: 4,
-                purchasable:!!Object.keys(action.payload)
-                .map(igKey => action.payload[igKey])
-                .reduce((sum, el) => sum + el, 0),
-                error: false
-            });
-        case actionTypes.FETCH_INGREDIENTS_FAILED:
-            return updateObject(state, { error: true });
+        case actionTypes.CLEAR_INGREDIENTS:
+            return initialState
         default:
             return state;
     }

@@ -1,30 +1,18 @@
 import React from 'react';
 import { Redirect } from 'react-router';
-import CheckoutSummary from '../../components/Order/CheckoutSummary/CheckoutSummary';
 import ContactData from '../../containers/Checkout/ContactData/ContactData';
-import { Route } from 'react-router-dom';
 import { connect } from 'react-redux';
+import styles from './Checkout.module.css'
 
-const Checkout = ({ ingredients, history, purchased, match:{path} }) => {
-    let summary = <Redirect to='/' />
-    if (ingredients) {
-        const purchasedRedirect = purchased ? <Redirect to='/' /> : null
-        summary = (
-            <div>
-                {purchasedRedirect}
-                <CheckoutSummary
-                    ingredients={ingredients}
-                    checkoutContinued={() => history.replace('/checkout/contact-data')}
-                    checkoutCancelled={() => history.goBack()}
-                />
-                <Route
-                    path={path + '/contact-data'} component={ContactData}
-                />
-            </div>
-        )
-    }
-    return summary;
+const Checkout = ({ totalPrice }) => {
+    let checkout = <Redirect to='/' />
+    if (totalPrice) checkout = (
+        <div className={styles.checkout}>
+            <ContactData/>
+        </div>
+    )
+    return checkout;
 }
-const mapStateToProps = ({ burger: { ingredients }, order: { purchased } }) => ({ ingredients, purchased });
+const mapStateToProps = ({ cart: { totalPrice } }) => ({ totalPrice });
 
 export default connect(mapStateToProps)(Checkout);

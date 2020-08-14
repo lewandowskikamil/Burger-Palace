@@ -1,16 +1,14 @@
 export {
     addIngredient,
     removeIngredient,
-    setIngredients,
-    fetchIngredientsFailed,
-    initIngredients,
+    clearIngredients
 
 } from './burgerBuilder';
 export {
-    purchaseInit,
-    purchaseBurger,
+    makeOrder,
+    clearOrderError,
     fetchOrders,
-    changeOrderFilters
+    changeOrderFilters,
 } from './order'
 export {
     auth,
@@ -18,3 +16,9 @@ export {
     setAuthRedirectPath,
     authCheckState
 } from './auth'
+export {
+    addCartItem,
+    removeCartItem,
+    updateCart,
+    clearCart
+} from './cart'

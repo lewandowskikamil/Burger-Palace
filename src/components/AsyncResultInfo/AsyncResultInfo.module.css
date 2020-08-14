@@ -1,0 +1,15 @@
+.asyncResultInfo{
+    text-align: center;
+}
+.asyncResultInfo h2 {
+    margin-bottom: 20px;
+}
+
+.asyncResultInfo p {
+    margin-bottom: 15px;
+    text-align: justify;
+}
+
+.asyncResultInfo button {
+    margin: 0 auto;
+}

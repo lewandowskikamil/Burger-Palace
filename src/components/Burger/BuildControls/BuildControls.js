@@ -9,7 +9,7 @@ const controls = [
     { label: 'Meat', type: 'meat' },
 ]
 
-const BuildControls = ({ ingredientAdded, ingredientRemoved, disabled, price, purchasable, purchased, isAuthed }) => {
+const BuildControls = ({ ingredientAdded, ingredientRemoved, disabled, price, purchasable, addedToCart }) => {
     return (
         <div className={styles.buildControls}>
             <p>Current price: <strong>{price.toFixed(2)}</strong></p>
@@ -26,9 +26,9 @@ const BuildControls = ({ ingredientAdded, ingredientRemoved, disabled, price, pu
             <button
                 className={styles.orderButton}
                 disabled={!purchasable}
-                onClick={purchased}
+                onClick={addedToCart}
             >
-                Order
+                Add to cart
             </button>
         </div>
     );

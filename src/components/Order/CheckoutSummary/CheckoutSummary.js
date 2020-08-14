@@ -1,6 +1,6 @@
 import React from 'react';
 import Burger from '../../Burger/Burger';
-import Button from '../../UI/Button/Button';
+import SlimButton from '../../UI/SlimButton/SlimButton';
 import styles from './CheckoutSummary.module.css';
 
 const CheckoutSummary = ({ ingredients, checkoutContinued, checkoutCancelled }) => {
@@ -16,10 +16,12 @@ const CheckoutSummary = ({ ingredients, checkoutContinued, checkoutCancelled }) 
             <div style={{
                 width: '100%'
             }}>
-                <Burger ingredients={ingredients} />
+                <div className={styles.burgerWrapper}>
+                    <Burger ingredients={ingredients} />
+                </div>
             </div>
-            <Button btnType="success" clicked={checkoutContinued}>Continue</Button>
-            <Button btnType="danger" clicked={checkoutCancelled}>Cancel</Button>
+            <SlimButton btnType="success" clicked={checkoutContinued}>Continue</SlimButton>
+            <SlimButton btnType="danger" clicked={checkoutCancelled}>Cancel</SlimButton>
         </div>
     );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { updateObject, checkValidity } from '../../../shared/utility';
-import Button from '../../../components/UI/Button/Button';
+import SlimButton from '../../../components/UI/SlimButton/SlimButton';
 import Input from '../../../components/UI/Input/Input';
 // import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 import styles from './OrderFilters.module.css';
@@ -132,7 +132,7 @@ const OrderFilters = ({ onFilterOrders }) => {
     let form = (
         <form onSubmit={filtersSubmitHandler}>
             {formElementsArray}
-            <Button btnType='success' disabled={!isFormValid}>Filter</Button>
+            <SlimButton btnType='success' disabled={!isFormValid}>Filter</SlimButton>
         </form>
     )
     return (

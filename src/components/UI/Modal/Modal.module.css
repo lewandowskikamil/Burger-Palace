@@ -1,20 +1,20 @@
 .modal {
     position: fixed;
+    left: calc(50% - 150px);
+    top: calc(50% - 150px);
     z-index: 500;
+    width: 300px;
+    padding: 15px;
     background-color: white;
-    width: 70%;
     border: 1px solid #ccc;
     box-shadow: 1px 1px 1px black;
-    padding: 16px;
-    left: 15%;
-    top: 30%;
-    box-sizing: border-box;
     transition: all 0.3s ease-out;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 576px) {
     .modal {
         width: 500px;
+        padding: 30px;
         left: calc(50% - 250px);
     }
 }

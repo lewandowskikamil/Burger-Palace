@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '../../UI/Button/Button'
+import SlimButton from '../../UI/SlimButton/SlimButton'
 
 const OrderSummary = ({ ingredients, canceled, continued, price }) => {
     const ingredientSummary = Object.keys(ingredients)
@@ -17,18 +17,18 @@ const OrderSummary = ({ ingredients, canceled, continued, price }) => {
             </ul>
             <p><strong>Total price: {price.toFixed(2)}</strong></p>
             <p>Continue to checkout?</p>
-            <Button
+            <SlimButton
                 btnType='danger'
                 clicked={canceled}
             >
                 Cancel
-            </Button>
-            <Button
+            </SlimButton>
+            <SlimButton
                 btnType='success'
                 clicked={continued}
             >
                 Continue
-            </Button>
+            </SlimButton>
         </>
     );
 }

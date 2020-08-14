@@ -1,6 +1,9 @@
-.checkoutSummary {
+.burgerWrapper {
     margin: 0 auto;
-    text-align: center;
+    height: 250px;
+    width: 280px;
+    overflow: auto;
+    padding-top:30px;
 }
 
 @media (min-width:576px) {

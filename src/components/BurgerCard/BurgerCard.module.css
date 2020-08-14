@@ -1,0 +1,128 @@
+.burgerCard {
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 3px #ccc;
+}
+
+.burgerCard h4 {
+    margin: 30px 0 40px;
+    font-size: 30px;
+}
+
+.burgerCard p {
+    font-size: 20px;
+}
+
+.burgerCard .price {
+    margin-top: 20px;
+}
+
+.menuItem .burgerWrapper,
+.cartItem .burgerWrapper {
+    margin: 0 auto;
+    width: 280px;
+    height: 250px;
+    overflow: auto;
+}
+
+.menuItem {
+    margin: 20px auto;
+    width: 300px;
+    max-width: 750px;
+}
+
+.menuItem .description {
+    font-family: 'Great Vibes', cursive;
+    font-size: 24px;
+    margin-top: -45px;
+    padding: 20px 10px;
+}
+
+.cartItem {
+    margin: 20px;
+    padding: 10px 10px 30px;
+}
+
+.cartItem .amountPanel {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.cartItem .amountPanel button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    font-size: 20px;
+    color:#703B09;
+}
+
+.cartItem .amountPanel span {
+    margin: 0 10px;
+    font-size: 20px;
+}
+
+@media (min-width:576px) {
+    .menuItem {
+        width: 420px;
+    }
+
+    .menuItem .description {
+        margin-top: -55px;
+    }
+
+    .menuItem .burgerWrapper {
+        width: 400px;
+        height: 340px;
+    }
+}
+
+@media (min-width:768px) {
+    .menuItem {
+        width: 500px;
+    }
+
+    .menuItem .description {
+        margin-top: -65px;
+    }
+
+    .menuItem .burgerWrapper {
+        width: 480px;
+        height: 400px;
+    }
+}
+
+@media (min-width:992px) {
+    .menuItem {
+        width: 560px;
+    }
+
+    .menuItem .description {
+        margin-top: -75px;
+        font-size: 30px;
+    }
+
+    .menuItem .burgerWrapper {
+        width: 540px;
+        height: 450px;
+    }
+}
+
+@media (min-width:1200px) {
+    .menuItem {
+        width: 620px;
+    }
+
+    .menuItem .description {
+        margin-top: -85px;
+    }
+
+    .menuItem .burgerWrapper {
+        width: 600px;
+        height: 500px;
+    }
+}

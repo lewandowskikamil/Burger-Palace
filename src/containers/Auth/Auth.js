@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import Input from '../../components/UI/Input/Input';
-import Button from '../../components/UI/Button/Button';
+import SlimButton from '../../components/UI/SlimButton/SlimButton';
 import styles from './Auth.module.css';
 import * as actions from '../../store/actions';
 import Spinner from '../../components/UI/Spinner/Spinner';
@@ -49,7 +49,7 @@ const initialFormData = {
 
 const Auth = ({
     onAuth,
-    purchasable,
+    totalPrice,
     authRedirectPath,
     onSetAuthRedirectPath,
     loading,
@@ -95,8 +95,8 @@ const Auth = ({
     }
 
     useEffect(() => {
-        if (!purchasable && authRedirectPath !== '/') onSetAuthRedirectPath('/');
-    }, [purchasable, authRedirectPath, onSetAuthRedirectPath])
+        if (!totalPrice && authRedirectPath !== '/') onSetAuthRedirectPath('/');
+    }, [totalPrice, authRedirectPath, onSetAuthRedirectPath])
 
     const formElementsArray = Object.keys(formData)
         .map(elKey => ({
@@ -116,7 +116,7 @@ const Auth = ({
     let form = (
         <form onSubmit={submitHandler}>
             {formElementsArray}
-            <Button btnType='success' disabled={!isFormValid}>{isSignUp ? 'Sign Up' : 'Sign In'}</Button>
+            <SlimButton btnType='success' disabled={!isFormValid}>{isSignUp ? 'Sign Up' : 'Sign In'}</SlimButton>
         </form>
     )
     if (loading) form = <Spinner />
@@ -131,18 +131,18 @@ const Auth = ({
             <h2>{isSignUp ? 'Sign Up' : 'Sign In'}</h2>
             {errorMessage}
             {form}
-            <Button btnType='danger' clicked={switchAuthModeHandler}>Switch to {isSignUp ? 'Sign In' : 'Sign Up'} Panel</Button>
+            <SlimButton btnType='primary' clicked={switchAuthModeHandler}>Switch to {isSignUp ? 'Sign In' : 'Sign Up'} Panel</SlimButton>
         </div>
     );
 }
 const mapStateToProps = ({
     auth: { loading, error, token, authRedirectPath },
-    burger: { purchasable }
+    cart: { totalPrice }
 }) => ({
     loading,
     error,
     isAuthed: !!token,
-    purchasable,
+    totalPrice,
     authRedirectPath
 })
 

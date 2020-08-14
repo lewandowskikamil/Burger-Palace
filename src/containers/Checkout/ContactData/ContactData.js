@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import Button from '../../../components/UI/Button/Button';
+import { Redirect } from 'react-router-dom';
+import SlimButton from '../../../components/UI/SlimButton/SlimButton';
 import Spinner from '../../../components/UI/Spinner/Spinner';
+import Modal from '../../../components/UI/Modal/Modal';
+import AsyncResultInfo from '../../../components/AsyncResultInfo/AsyncResultInfo';
 import Input from '../../../components/UI/Input/Input';
 import styles from './ContactData.module.css';
-import axios from '../../../axios-orders';
 import { connect } from 'react-redux';
-import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 import * as actions from '../../../store/actions/';
 import { updateObject, checkValidity } from '../../../shared/utility';
 
@@ -72,7 +73,7 @@ const initialFormData = {
         value: '',
         validation: {
             required: true,
-            isNumeric:true,
+            isNumeric: true,
             minLength: 9,
             maxLength: 9,
             errorMessage: 'Enter valid phone number - it should consist of 9 digits'
@@ -97,25 +98,35 @@ const initialFormData = {
     }
 }
 
-const ContactData = ({ ingredients, userId, totalPrice, onOrderSubmit, loading, token }) => {
+const ContactData = ({
+    items,
+    userId,
+    totalPrice,
+    onOrderSubmit,
+    onSuccessAcceptance,
+    onFailureAcceptance,
+    loading,
+    error
+}) => {
     const [formData, setFormData] = useState(initialFormData);
     const [isFormValid, setIsFormValid] = useState(false);
+
     const orderHandler = (e) => {
         e.preventDefault();
         const fieldValues = {}
         for (const formElementIdentifier in formData) {
             fieldValues[formElementIdentifier] = formData[formElementIdentifier].value;
         }
-        const order = {
+        const orderData = {
             userId,
-            ingredients,
-            price: totalPrice,
-            orderDate:Date.parse(new Date()),
-            orderData: fieldValues,
-            // in production total price should be calculated at server side in order to prevent any manipulation from the client side
+            cartItems: items,
+            totalPrice,
+            orderTimestamp: Date.parse(new Date()),
+            deliveryData: fieldValues,
         }
-        onOrderSubmit(order, token);
+        onOrderSubmit(orderData);
     }
+
     const inputChangeHandler = (e) => {
         const { [e.target.name]: formElement } = formData;
         const updatedFormElement = updateObject(formElement, {
@@ -141,6 +152,9 @@ const ContactData = ({ ingredients, userId, totalPrice, onOrderSubmit, loading, 
             setIsFormValid(isFormValid);
         }
     }
+
+    if (!totalPrice) return <Redirect to='/' />
+
     const formElementsArray = Object.keys(formData)
         .map(elKey => ({
             ...formData[elKey],
@@ -159,29 +173,54 @@ const ContactData = ({ ingredients, userId, totalPrice, onOrderSubmit, loading, 
     let form = (
         <form onSubmit={orderHandler}>
             {formElementsArray}
-            <Button btnType='success' disabled={!isFormValid}>Order</Button>
+            <SlimButton btnType='success' disabled={!isFormValid}>Order</SlimButton>
         </form>
     )
+
     if (loading) form = <Spinner />
+
     return (
-        <div className={styles.contactData}>
-            <h2>Enter delivery data</h2>
-            {form}
-        </div>
+        <>
+            <Modal
+                show={error !== null}
+                modalClosed={error ? onFailureAcceptance : onSuccessAcceptance}
+            >
+                {error !== null && <AsyncResultInfo
+                    infoType={error ? 'danger' : 'success'}
+                    clicked={error ? onFailureAcceptance : onSuccessAcceptance}
+                />}
+            </Modal>
+            <div className={styles.contactData}>
+                <h2>
+                    {loading ? 'Your order is being confirmed...' : 'Enter delivery data'}
+                </h2>
+                {form}
+            </div>
+        </>
     );
 }
-const mapStateToProps = ({ burger: { ingredients, totalPrice }, order: { loading }, auth: { token, userId } }) => ({
-    ingredients,
+const mapStateToProps = ({
+    cart: { items, totalPrice },
+    order: { loading, error },
+    auth: { userId }
+}) => ({
+    items,
     totalPrice,
+    error,
     loading,
-    token,
     userId
 });
 
 const mapDispatchToProps = dispatch => ({
-    onOrderSubmit: (orderData, token) => {
-        dispatch(actions.purchaseBurger(orderData, token))
+    onOrderSubmit: (orderData) => {
+        dispatch(actions.makeOrder(orderData))
+    },
+    onSuccessAcceptance: () => {
+        dispatch(actions.clearCart())
+    },
+    onFailureAcceptance: () => {
+        dispatch(actions.clearOrderError())
     }
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(ContactData, axios));
+export default connect(mapStateToProps, mapDispatchToProps)(ContactData);

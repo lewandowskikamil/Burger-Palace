@@ -1,12 +1,14 @@
 import React from 'react';
-import styles from './Button.module.css'
+import styles from './Button.module.css';
 
-const Button = ({ children, clicked, btnType, disabled }) => {
+const Button = ({ children, lg, clicked }) => {
+    const btnClasses = [styles.btn];
+    if (lg) btnClasses.push(styles.lg)
+    else btnClasses.push(styles.sm)
     return (
         <button
+            className={btnClasses.join(' ')}
             onClick={clicked}
-            className={[styles.button, styles[btnType]].join(' ')}
-            disabled={Boolean(disabled)}
         >
             {children}
         </button>

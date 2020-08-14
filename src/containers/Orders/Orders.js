@@ -3,8 +3,6 @@ import { connect } from 'react-redux';
 import OrderTable from '../../components/Order/OrderTable/OrderTable';
 import OrderFilters from '../../components/Order/OrderFilters/OrderFilters';
 import OrderStats from '../../components/Order/OrderStats/OrderStats';
-import axios from '../../axios-orders';
-import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import * as actions from '../../store/actions';
 import styles from './Orders.module.css';
@@ -29,22 +27,30 @@ const Orders = ({
 
     if (filteredOrders.length) {
         ordersToShow = <OrderTable orders={filteredOrders} />;
-        orderStatsToShow = <OrderStats orderStats={orderStats} />;
+        orderStatsToShow = <OrderStats {...orderStats} />;
     }
 
     let displayedOrders = orders.length ? (
-        <div className={styles.orders}>
-            <h2>Orders</h2>
+        <>
             {ordersToShow}
             <OrderFilters onFilterOrders={onFilterOrders} />
             {orderStatsToShow}
-        </div>
-    ) : <p>There are no orders to show.</p>
+        </>
+    ) : (
+            <p>There are no orders to show.</p>
+        )
 
-    if (error) displayedOrders = <p>Something went wrong, please try again later.</p>
+    if (error) displayedOrders = (
+        <p>Something went wrong, please try again later.</p>
+    )
     if (loading) displayedOrders = <Spinner />
 
-    return displayedOrders;
+    return (
+        <div className={styles.orders}>
+            <h2>Orders</h2>
+            {displayedOrders}
+        </div>
+    )
 }
 
 const mapStateToProps = ({
@@ -69,4 +75,4 @@ const mapDispatchToProps = dispatch => ({
     }
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(Orders, axios));
+export default connect(mapStateToProps, mapDispatchToProps)(Orders);

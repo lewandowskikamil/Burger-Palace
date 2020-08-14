@@ -16,7 +16,7 @@ const Burger = ({ ingredients }) => {
             return arr.concat(el)
         }, [])
         if(!transformedIngredients.length){
-            transformedIngredients=<p>Add some ingredients bro!</p>
+            transformedIngredients=<p className={styles.hint}>Add some ingredients bro!</p>
         }
     return (
         <div className={styles.burger}>
