@@ -1,7 +1,14 @@
 import React from 'react';
 import styles from './BuildControl.module.css';
 
-const BuildControl = ({ label, ingredientAdded, ingredientRemoved, type, disabled }) => {
+const BuildControl = ({
+    label,
+    addIngredient,
+    removeIngredient,
+    type,
+    disabled,
+    price
+}) => {
     return (
         <div className={styles.buildControl}>
             <span className={styles.label}>
@@ -9,14 +16,14 @@ const BuildControl = ({ label, ingredientAdded, ingredientRemoved, type, disable
             </span>
             <button
                 className={styles.less}
-                onClick={() => ingredientRemoved(type)}
+                onClick={() => removeIngredient(type, price)}
                 disabled={disabled}
             >
                 Less
             </button>
             <button
                 className={styles.less}
-                onClick={() => ingredientAdded(type)}
+                onClick={() => addIngredient(type, price)}
             >
                 More
             </button>

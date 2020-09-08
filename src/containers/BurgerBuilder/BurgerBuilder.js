@@ -2,171 +2,173 @@ import React, { useState } from 'react';
 import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
-// import Spinner from '../../components/UI/Spinner/Spinner';
+import Spinner from '../../components/UI/Spinner/Spinner';
+import SlimButton from '../../components/UI/SlimButton/SlimButton';
 import AddingConfirmation from '../../components/AddingConfirmation/AddingConfirmation';
 import { connect } from 'react-redux';
+import { compose } from 'redux';
+import { firestoreConnect } from 'react-redux-firebase';
 import * as actions from '../../store/actions';
 import styles from './BurgerBuilder.module.css';
 
 const BurgerBuilder = ({
-    // isAuthed,
     history,
-    // onSetAuthRedirectPath,
-    // onPurchaseInit,
-    onIngredientAdded,
-    onIngredientRemoved,
-    onIngredientsCleared,
-    // onIngredientsInit,
+    onAddIngredient,
+    onRemoveIngredient,
+    onClearIngredients,
     onAddToCart,
     ingredients,
     totalPrice,
     purchasable,
+    cartError,
+    cartLoading,
+    prices,
+    pricesRequested,
+    pricesError,
+    isAuthed
 }) => {
-    //     const [purchasing, setPurchasing] = useState(false);
-    //     const purchaseHandler = (purchasing) => {
-    //         if (isAuthed) setPurchasing(purchasing);
-    //         else {
-    //             onSetAuthRedirectPath('/checkout');
-    //             history.push('/auth');
-    //         }
-    //     }
-    //     const purchaseContinueHandler = () => {
-    //         onPurchaseInit();
-    //         history.push('/checkout');
-
-    // }
     const [isModalShowed, setIsModalShowed] = useState(false);
-    const [lastAddedBurger, setLastAddedBurger] = useState(null);
-    const addToCartHandler = (ingredients, price) => {
-        const item = {
-            id: Date.parse(new Date()),
-            name: 'Custom burger',
-            ingredients,
-            price,
-            amount: 1
+    const [addedBurger, setAddedBurger] = useState(null);
+    const addToCart = (ingredients, totalPrice) => {
+        if (isAuthed) {
+            const item = {
+                name: 'Custom burger',
+                ingredients,
+            }
+            onAddToCart(item);
+            setAddedBurger({
+                ...item,
+                price: totalPrice
+            });
         }
-        onAddToCart(item);
-        setLastAddedBurger(item);
         setIsModalShowed(true);
     }
-    const redirectPageHandler=()=>{
-        onIngredientsCleared();
+    const redirectToCart = () => {
+        onClearIngredients();
         history.push('/cart');
     }
-    const dismissModalHandler=()=>{
-        onIngredientsCleared();
+    const redirectToSignIn = () => {
+        const state = {
+            prevPath: history.location.pathname
+        }
+        history.push('/auth', state);
+    }
+    const dismissModal = (err) => {
+        if (!err) onClearIngredients();
         setIsModalShowed(false);
     }
-    // useEffect(() => {
-    //     onIngredientsInit()
-    // }, [onIngredientsInit])
 
-    const disabledInfo = {
-        ...ingredients
-    }
-    for (const key in disabledInfo) {
-        disabledInfo[key] = !disabledInfo[key]
-    }
-    // let orderSummary = null;
-    // let burger = error ? (
-    //     <p
-    //         style={{
-    //             padding: '10px',
-    //             textAlign: 'center'
-    //         }}
-    //     >
-    //         Sorry, at the moment ingredients can't be loaded. Please, try again later.
-    //     </p>
-    // ) : (
-    //         <div
-    //             style={{
-    //                 height: '80vh',
-    //                 display: 'flex',
-    //                 justifyContent: 'center',
-    //                 alignItems: 'center'
-    //             }}
-    //         >
-    //             <Spinner />
-    //         </div>
-    //     )
-    // if (ingredients) {
-    //     orderSummary = (
-    //         <OrderSummary
-    //             ingredients={ingredients}
-    //             canceled={() => purchaseHandler(false)}
-    //             continued={purchaseContinueHandler}
-    //             price={totalPrice}
-    //         />
-    //     )
-    //     burger = (
-    //         <>
-    //             <div className={styles.burgerWrapper}>
-    //                 <Burger ingredients={ingredients} />
-    //             </div>
-    //             <BuildControls
-    //                 ingredientAdded={onIngredientAdded}
-    //                 ingredientRemoved={onIngredientRemoved}
-    //                 disabled={disabledInfo}
-    //                 price={totalPrice}
-    //                 purchasable={purchasable}
-    //                 addedToCart={() => addToCartHandler(ingredients, totalPrice)}
-    //             />
-    //         </>
-    //     )
-    // }
+    if (!pricesRequested) return (
+        <div
+            style={{
+                margin: '100px 0',
+                display: 'flex',
+                justifyContent: 'center'
+            }}
+        >
+            <Spinner />
+        </div>
+    )
+    if (pricesError) return (
+        <p>Unfortunately, an error occured while trying to fetch ingredient prices from our database. Please, try again later.</p>
+    )
+
+    const availableIngredients = ['bacon', 'cheese', 'meat', 'salad'];
+    const disabledInfo = {};
+    availableIngredients.forEach(ingredient => {
+        disabledInfo[ingredient] = !ingredients.includes(ingredient);
+    });
+
+    let modalContent = null;
+    if (isModalShowed && !isAuthed) modalContent = (
+        <div>
+            <h2 className='danger'>You're not signed in!</h2>
+            <p>Only authenticated users can add items to cart. Authentication will take you just a moment.</p>
+            <SlimButton
+                btnType='success'
+                clicked={redirectToSignIn}
+            >
+                Sign In
+            </SlimButton>
+        </div>
+    );
+    if (isModalShowed && isAuthed) modalContent = (
+        <AddingConfirmation
+            burgerDetails={addedBurger}
+            dismissModal={() => dismissModal(cartError)}
+            redirectToCart={redirectToCart}
+            error={cartError}
+            loading={cartLoading}
+            addItem={onAddToCart}
+        />
+    )
 
     return (
         <>
             <Modal
                 show={isModalShowed}
-                modalClosed={() => setIsModalShowed(false)}
+                modalClosed={() => dismissModal(cartError)}
             >
-                {lastAddedBurger && <AddingConfirmation
-                    burgerDetails={lastAddedBurger}
-                    modalDismissed={dismissModalHandler}
-                    pageRedirected={redirectPageHandler}
-                />}
+                {modalContent}
             </Modal>
             <div className={styles.burgerWrapper}>
                 <Burger ingredients={ingredients} />
             </div>
             <BuildControls
-                ingredientAdded={onIngredientAdded}
-                ingredientRemoved={onIngredientRemoved}
+                addIngredient={onAddIngredient}
+                removeIngredient={onRemoveIngredient}
                 disabled={disabledInfo}
-                price={totalPrice}
+                price={totalPrice || prices[0].bun}
                 purchasable={purchasable}
-                addedToCart={() => addToCartHandler(ingredients, totalPrice)}
+                addToCart={()=>addToCart(ingredients, totalPrice)}
+                prices={prices[0]}
             />
         </>
-    );
+    )
 }
 
 const mapStateToProps = ({
-    burger: { ingredients, totalPrice, purchasable }
+    burger: {
+        ingredients,
+        totalPrice,
+        purchasable
+    },
+    cart: {
+        error,
+        loading
+    },
+    firestore: {
+        ordered,
+        status,
+        errors
+    },
+    firebase: {
+        auth
+    }
 }) => ({
     ingredients,
     totalPrice,
-    purchasable
+    purchasable,
+    cartError: error,
+    cartLoading: loading,
+    pricesRequested:status.requested.prices,
+    pricesError:errors.allIds.includes('prices'),
+    prices: ordered.prices,
+    isAuthed: !!auth.uid
 });
 const mapDispatchToProps = dispatch => ({
-    onIngredientAdded: ingredientName => {
-        dispatch(actions.addIngredient(ingredientName))
+    onAddIngredient: (ingredientName, ingredientPrice) => {
+        dispatch(actions.addIngredient(ingredientName, ingredientPrice))
     },
-    onIngredientRemoved: ingredientName => {
-        dispatch(actions.removeIngredient(ingredientName))
+    onRemoveIngredient: (ingredientName, ingredientPrice) => {
+        dispatch(actions.removeIngredient(ingredientName, ingredientPrice))
     },
-    // onIngredientsInit: () => {
-    //     dispatch(actions.initIngredients())
-    // },
-    // onPurchaseInit: () => {
-    //     dispatch(actions.purchaseInit())
-    // },
-    // onSetAuthRedirectPath: (path) => {
-    //     dispatch(actions.setAuthRedirectPath(path))
-    // },
-    onIngredientsCleared: () => dispatch(actions.clearIngredients()),
-    onAddToCart: item => dispatch(actions.addCartItem(item))
+    onClearIngredients: () => dispatch(actions.clearIngredients()),
+    onAddToCart: item => dispatch(actions.addItem(item))
 })
-
-export default connect(mapStateToProps, mapDispatchToProps)(BurgerBuilder);
+export default compose(
+    connect(mapStateToProps, mapDispatchToProps),
+    firestoreConnect([
+        { collection: 'ingredients', doc: 'prices', storeAs:'prices' },
+    ])
+)(BurgerBuilder);

@@ -1,7 +1,23 @@
-.checkout{
-    min-height: calc(100vh - 60px);
-    padding: 40px 20px;
+.contactData {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 3px #ccc;
+}
+.contactData h2{
+    margin: 20px 0;
+}
+
+.contactData form {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    min-height: 200px;
+    justify-content:space-between;
+    flex-direction: column;
+}
+
+@media (min-width:576px) {
+    .contactData {
+        width: 500px;
+    }
 }

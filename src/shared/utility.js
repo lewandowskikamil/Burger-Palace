@@ -24,7 +24,7 @@ export const checkValidity = (value, rules) => {
         isValid = pattern.test(value) && isValid
     }
     if (rules.isOptionalPrice) {
-        isValid = (+value > 4 || value === '') && isValid
+        isValid = (+value > 0 || value === '') && isValid
     }
 
     return isValid

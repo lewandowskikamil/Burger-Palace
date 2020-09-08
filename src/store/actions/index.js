@@ -6,19 +6,18 @@ export {
 } from './burgerBuilder';
 export {
     makeOrder,
-    clearOrderError,
-    fetchOrders,
-    changeOrderFilters,
-} from './order'
+} from './order';
+export {
+    filterOrders,
+    calculateOrdersStats,
+    setOrdersFilters,
+} from './orders';
 export {
     auth,
-    logout,
-    setAuthRedirectPath,
-    authCheckState
-} from './auth'
+    signout
+} from './auth';
 export {
-    addCartItem,
-    removeCartItem,
-    updateCart,
+    addItem,
+    removeItem,
     clearCart
-} from './cart'
+} from './cart';

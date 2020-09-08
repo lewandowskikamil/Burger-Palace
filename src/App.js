@@ -1,4 +1,4 @@
-import React, { useEffect} from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import Layout from './hoc/Layout/Layout';
@@ -9,23 +9,15 @@ import BurgerBuilder from './containers/BurgerBuilder/BurgerBuilder';
 import Checkout from './containers/Checkout/Checkout';
 import Orders from './containers/Orders/Orders';
 import Auth from './containers/Auth/Auth';
-import Logout from './containers/Auth/Logout/Logout';
-import * as actions from './store/actions';
+import Signout from './containers/Auth/Signout/Signout';
 
-
-
-const App = ({ onTryAutoSignIn, onUpdateCart, isAuthed }) => {
-  useEffect(() => {
-    onUpdateCart();
-    onTryAutoSignIn();
-  }, [onTryAutoSignIn, onUpdateCart]);
+const App = ({ isAuthed }) => {
   let routes = (
     <Switch>
       <Route path='/auth' component={Auth} />
       <Route path='/about' component={About} />
       <Route path='/menu' component={Menu} />
-      <Route path='/cart' component={Cart} />
-      <Route path='/checkout' component={Checkout} />
+      <Route path='/signout' component={Signout} />
       <Route path='/' exact component={BurgerBuilder} />
       <Redirect to='/' />
     </Switch>
@@ -34,7 +26,7 @@ const App = ({ onTryAutoSignIn, onUpdateCart, isAuthed }) => {
     <Switch>
       <Route path='/checkout' component={Checkout} />
       <Route path='/orders' component={Orders} />
-      <Route path='/logout' component={Logout} />
+      <Route path='/signout' component={Signout} />
       <Route path='/auth' component={Auth} />
       <Route path='/about' component={About} />
       <Route path='/menu' component={Menu} />
@@ -45,16 +37,11 @@ const App = ({ onTryAutoSignIn, onUpdateCart, isAuthed }) => {
   )
   return (
     <Layout>
-        {routes}
+      {routes}
     </Layout>
   );
 }
 
-const mapStateToProps = ({ auth: { token } }) => ({ isAuthed: !!token });
+const mapStateToProps = ({ firebase: { auth } }) => ({ isAuthed: !!auth.uid });
 
-const mapDispatchToProps = dispatch => ({
-  onTryAutoSignIn: () => dispatch(actions.authCheckState()),
-  onUpdateCart:()=>dispatch(actions.updateCart())
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(mapStateToProps)(App);

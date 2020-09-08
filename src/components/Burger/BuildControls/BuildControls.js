@@ -9,7 +9,15 @@ const controls = [
     { label: 'Meat', type: 'meat' },
 ]
 
-const BuildControls = ({ ingredientAdded, ingredientRemoved, disabled, price, purchasable, addedToCart }) => {
+const BuildControls = ({
+    addIngredient,
+    removeIngredient,
+    disabled,
+    price,
+    purchasable,
+    addToCart,
+    prices
+}) => {
     return (
         <div className={styles.buildControls}>
             <p>Current price: <strong>{price.toFixed(2)}</strong></p>
@@ -18,15 +26,16 @@ const BuildControls = ({ ingredientAdded, ingredientRemoved, disabled, price, pu
                     key={label}
                     label={label}
                     type={type}
-                    ingredientAdded={ingredientAdded}
-                    ingredientRemoved={ingredientRemoved}
+                    addIngredient={addIngredient}
+                    removeIngredient={removeIngredient}
                     disabled={disabled[type]}
+                    price={prices[type]}
                 />
             ))}
             <button
                 className={styles.orderButton}
                 disabled={!purchasable}
-                onClick={addedToCart}
+                onClick={addToCart}
             >
                 Add to cart
             </button>

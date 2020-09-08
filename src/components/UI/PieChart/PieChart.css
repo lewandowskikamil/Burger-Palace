@@ -1,0 +1,8 @@
+.legendCells{
+    display:flex;
+    justify-content: space-between;
+    flex-wrap:wrap;
+}
+.legendCells .cell{
+    flex-basis:40%;
+}

@@ -6,6 +6,7 @@
 
 .orderTable {
     display: inline-block;
+    margin:0 auto;
     vertical-align: top;
     max-width: 90%;
     max-height: 80vh;

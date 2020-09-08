@@ -4,8 +4,18 @@ import Burger from '../Burger/Burger';
 import styles from './BurgerCard.module.css';
 
 const BurgerCard = ({
-    burgerInfo: { name, ingredients, description, price, amount, id },
-    btnClicked, forTheCart, amountIncreased, amountDecreased
+    burgerInfo: {
+        name,
+        ingredients,
+        description,
+        price,
+        amount,
+        id
+    },
+    btnClicked,
+    forTheCart,
+    amountIncreased,
+    amountDecreased
 }) => {
 
     const ingredientsInfo = []
@@ -37,7 +47,7 @@ const BurgerCard = ({
                     <span className="fa fa-minus"></span>
                 </button>
                 <span><strong>{amount}</strong></span>
-                <button onClick={() => amountIncreased({ name, ingredients })}>
+                <button onClick={() => amountIncreased(name, ingredients)}>
                     <span className="fa fa-plus"></span>
                 </button>
             </div>

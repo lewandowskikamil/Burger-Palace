@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import Input from '../../components/UI/Input/Input';
 import SlimButton from '../../components/UI/SlimButton/SlimButton';
@@ -8,8 +8,7 @@ import Spinner from '../../components/UI/Spinner/Spinner';
 import { Redirect } from 'react-router-dom';
 import { updateObject, checkValidity } from '../../shared/utility';
 
-
-const initialFormData = {
+const initialSignInData = {
     email: {
         elementType: 'input',
         elementLabel: 'Email',
@@ -45,22 +44,78 @@ const initialFormData = {
         touched: false
     },
 }
+const initialSignUpData = {
+    ...initialSignInData,
+    fullName: {
+        elementType: 'input',
+        elementLabel: 'Full name',
+        elementConfig: {
+            id: 'fullNameInput',
+            type: 'text',
+            placeholder: 'Your full name'
+        },
+        value: '',
+        validation: {
+            required: true,
+            errorMessage: 'This field can\'t be empty'
+        },
+        valid: false,
+        touched: false
+    },
+    address: {
+        elementType: 'input',
+        elementLabel: 'Address',
+        elementConfig: {
+            id: 'addressInput',
+            type: 'text',
+            placeholder: 'Your address'
+        },
+        value: '',
+        validation: {
+            required: true,
+            errorMessage: 'This field can\'t be empty'
+        },
+        valid: false,
+        touched: false
+    },
+    phoneNumber: {
+        elementType: 'input',
+        elementLabel: 'Phone number',
+        elementConfig: {
+            id: 'phoneNumberInput',
+            type: 'text',
+            placeholder: 'Your phone number'
+        },
+        value: '',
+        validation: {
+            required: true,
+            isNumeric: true,
+            minLength: 9,
+            maxLength: 9,
+            errorMessage: 'Phone number must consist of 9 digits'
+        },
+        valid: false,
+        touched: false
+    },
+}
 
 
 const Auth = ({
-    onAuth,
-    totalPrice,
-    authRedirectPath,
-    onSetAuthRedirectPath,
+    onAuthUser,
     loading,
     error,
-    isAuthed
+    isAuthed,
+    history
 }) => {
+    const [isSignedUp, setIsSignedUp] = useState(false);
+    const initialFormData = isSignedUp ? initialSignInData : initialSignUpData;
     const [formData, setFormData] = useState(initialFormData);
     const [isFormValid, setIsFormValid] = useState(false);
-    const [isSignUp, setIsSignUp] = useState(false);
     const switchAuthModeHandler = () => {
-        setIsSignUp(!isSignUp)
+        if (isSignedUp) setFormData(initialSignUpData);
+        else setFormData(initialSignInData);
+        setIsFormValid(false);
+        setIsSignedUp(!isSignedUp);
     }
     const inputChangeHandler = (e) => {
         const { [e.target.name]: formElement } = formData;
@@ -89,14 +144,14 @@ const Auth = ({
     }
 
     const submitHandler = (e) => {
-        const { email, password } = formData;
+        const { email, password, fullName, address, phoneNumber } = formData;
         e.preventDefault();
-        onAuth(email.value, password.value, isSignUp)
+        if (isSignedUp) {
+            onAuthUser(email.value, password.value, isSignedUp)
+        } else {
+            onAuthUser(email.value, password.value, isSignedUp, fullName.value, address.value, phoneNumber.value)
+        }
     }
-
-    useEffect(() => {
-        if (!totalPrice && authRedirectPath !== '/') onSetAuthRedirectPath('/');
-    }, [totalPrice, authRedirectPath, onSetAuthRedirectPath])
 
     const formElementsArray = Object.keys(formData)
         .map(elKey => ({
@@ -116,42 +171,40 @@ const Auth = ({
     let form = (
         <form onSubmit={submitHandler}>
             {formElementsArray}
-            <SlimButton btnType='success' disabled={!isFormValid}>{isSignUp ? 'Sign Up' : 'Sign In'}</SlimButton>
+            <SlimButton btnType='success' disabled={!isFormValid}>{isSignedUp ? 'Sign In' : 'Sign Up'}</SlimButton>
         </form>
     )
     if (loading) form = <Spinner />
     let errorMessage = null;
     if (error) errorMessage = (
-        <p>{error.message}</p>
+        <p>{error}</p>
     )
-    if (isAuthed) return <Redirect to={authRedirectPath} />
+    if (isAuthed) {
+        const { prevPath } = history.location.state || { prevPath: '/' };
+        return <Redirect to={prevPath} />
+    }
 
     return (
         <div className={styles.auth}>
-            <h2>{isSignUp ? 'Sign Up' : 'Sign In'}</h2>
+            <h2>{isSignedUp ? 'Sign In' : 'Sign Up'}</h2>
             {errorMessage}
             {form}
-            <SlimButton btnType='primary' clicked={switchAuthModeHandler}>Switch to {isSignUp ? 'Sign In' : 'Sign Up'} Panel</SlimButton>
+            <SlimButton btnType='primary' clicked={switchAuthModeHandler}>Switch to {isSignedUp ? 'Sign Up' : 'Sign In'} Panel</SlimButton>
         </div>
     );
 }
 const mapStateToProps = ({
-    auth: { loading, error, token, authRedirectPath },
-    cart: { totalPrice }
+    auth: { loading, error },
+    firebase: { auth }
 }) => ({
     loading,
     error,
-    isAuthed: !!token,
-    totalPrice,
-    authRedirectPath
+    isAuthed: !!auth.uid
 })
 
 const mapDispatchToProps = dispatch => ({
-    onAuth: (email, password, isSignUp) => {
-        dispatch(actions.auth(email, password, isSignUp))
-    },
-    onSetAuthRedirectPath: (path) => {
-        dispatch(actions.setAuthRedirectPath(path))
+    onAuthUser: (email, password, isSignedUp, fullName, address, phoneNumber) => {
+        dispatch(actions.auth(email, password, isSignedUp, fullName, address, phoneNumber))
     }
 })
 

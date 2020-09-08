@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { updateObject, checkValidity } from '../../../shared/utility';
 import SlimButton from '../../../components/UI/SlimButton/SlimButton';
 import Input from '../../../components/UI/Input/Input';
-// import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 import styles from './OrderFilters.module.css';
 
 
@@ -48,7 +47,7 @@ const initialFormData = {
         value: '',
         validation: {
             required: false,
-            errorMessage: 'Price must be greater than 4.00',
+            errorMessage: 'Price must be greater than 0.',
             isOptionalPrice: true
         },
         valid: true,
@@ -65,32 +64,58 @@ const initialFormData = {
         value: '',
         validation: {
             required: false,
-            errorMessage: 'Price must be greater than 4.00',
+            errorMessage: 'Price must be greater than 0.',
             isOptionalPrice: true
         },
         valid: true,
         touched: false
     },
 }
-const OrderFilters = ({ onFilterOrders }) => {
-    const [formData, setFormData] = useState(initialFormData);
-    const [isFormValid, setIsFormValid] = useState(false);
+const OrderFilters = ({
+    savedFilters,
+    filterOrders,
+    setOrdersFilters,
+    orders,
+    ordersBurgers
+}) => {
 
-    const filtersSubmitHandler = (e) => {
+    let areFieldsValid = true;
+    let joinedFieldValues = '';
+    for (const inputIdentifier in initialFormData) {
+        initialFormData[inputIdentifier].value = savedFilters[inputIdentifier];
+        initialFormData[inputIdentifier].valid = checkValidity(
+            savedFilters[inputIdentifier],
+            initialFormData[inputIdentifier].validation
+        );
+        initialFormData[inputIdentifier].touched = !!savedFilters[inputIdentifier];
+
+        areFieldsValid = areFieldsValid && initialFormData[inputIdentifier].valid;
+        joinedFieldValues += initialFormData[inputIdentifier].value;
+    }
+
+    const isValid = areFieldsValid && !!joinedFieldValues;
+    const [formData, setFormData] = useState(initialFormData);
+    const [isFormValid, setIsFormValid] = useState(isValid);
+
+    useEffect(() => {
+        filterOrders(orders, ordersBurgers)
+    }, [savedFilters, orders, ordersBurgers, filterOrders]);
+
+    const formSubmitHandler = (e) => {
         e.preventDefault();
         const filters = {};
         for (const filterIdentifier in formData) {
             filters[filterIdentifier] = formData[filterIdentifier].value;
         }
-        onFilterOrders(filters)
+        setOrdersFilters(filters);
     }
-
     const inputChangeHandler = (e) => {
         const { [e.target.name]: formElement } = formData;
         const updatedFormElement = updateObject(formElement, {
             value: e.target.value,
             valid: checkValidity(
-                e.target.value, formElement.validation
+                e.target.value,
+                formElement.validation
             ),
         })
         if (!updatedFormElement.touched) updatedFormElement.touched = true
@@ -130,11 +155,17 @@ const OrderFilters = ({ onFilterOrders }) => {
             />
         ))
     let form = (
-        <form onSubmit={filtersSubmitHandler}>
+        <form onSubmit={formSubmitHandler}>
             {formElementsArray}
-            <SlimButton btnType='success' disabled={!isFormValid}>Filter</SlimButton>
+            <SlimButton
+                btnType='success'
+                disabled={!isFormValid}
+            >
+                Filter
+            </SlimButton>
         </form>
     )
+
     return (
         <div className={styles.orderFilters}>
             <h2>Enter filter data</h2>

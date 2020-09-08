@@ -12,3 +12,18 @@ body {
 ul{
   list-style:none;
 }
+.success {
+  color: #5C9210;
+}
+
+.danger {
+  color: #944317;
+}
+
+.neutral {
+  color: #40a4c8;
+}
+
+.primary {
+  color: #703B09;
+}

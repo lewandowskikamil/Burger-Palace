@@ -1,17 +1,27 @@
 import React from 'react';
 import styles from './OrderTable.module.css'
-const OrderTable = ({ orders }) => {
+const OrderTable = ({ filteredOrders, filteredOrdersBurgers }) => {
+    if (!filteredOrders.length) return (
+        <p>There are no matching orders.</p>
+    )
+    const allIngredients = filteredOrdersBurgers
+        .reduce((ingrArray, { ingredients }) => ingrArray.concat(ingredients), []);
+    const ingredientTypes = [...new Set(allIngredients)];
+    const ordersWithBurgers = filteredOrders.map(order => ({
+        ...order,
+        orderBurgers: filteredOrdersBurgers.filter(burger => burger.orderId === order.id)
+    }))
     const displayedOrders = (
-        orders
-            .sort((a, b) => b.orderTimestamp - a.orderTimestamp)
+        ordersWithBurgers
+            .sort((a, b) => b.timestamp - a.timestamp)
             .map(({
-                cartItems,
-                totalPrice,
-                orderTimestamp
+                orderBurgers,
+                orderPrice,
+                timestamp
             }) => {
-                const orderRows = cartItems.map((
+                const orderRows = orderBurgers.map((
                     {
-                        id,
+                        id: burgerId,
                         name,
                         ingredients,
                         amount,
@@ -20,36 +30,38 @@ const OrderTable = ({ orders }) => {
                     index,
                     array
                 ) => {
-                    const cartItemDetails = (
+                    const burgerDetails = (
                         <>
                             <td>{name}</td>
                             {
-                                Object.keys(ingredients).map(ingrKey => (
-                                    <td key={ingrKey}>{ingredients[ingrKey]}</td>
+                                ingredientTypes.map(ingrType => (
+                                    <td key={`${ingrType}_${burgerId}`}>
+                                        {ingredients.filter(ingr => ingr === ingrType).length}
+                                    </td>
                                 ))
                             }
                             <td>{amount}</td>
                             <td>{price.toFixed(2)}</td>
                         </>
                     )
-                    const orderDate=new Date(orderTimestamp).toLocaleDateString();
+                    const orderDate = new Date(timestamp).toLocaleDateString();
                     if (array.length === 1) return (
-                        <tr key={id}>
+                        <tr key={burgerId}>
                             <td>{orderDate}</td>
-                            <td>{totalPrice.toFixed(2)}</td>
-                            {cartItemDetails}
+                            <td>{orderPrice.toFixed(2)}</td>
+                            {burgerDetails}
                         </tr>
                     )
                     if (index === 0) return (
-                        <tr key={id}>
+                        <tr key={burgerId}>
                             <td rowSpan={array.length}>{orderDate}</td>
-                            <td rowSpan={array.length}>{totalPrice.toFixed(2)}</td>
-                            {cartItemDetails}
+                            <td rowSpan={array.length}>{orderPrice.toFixed(2)}</td>
+                            {burgerDetails}
                         </tr>
                     )
                     return (
-                        <tr key={id}>
-                            {cartItemDetails}
+                        <tr key={burgerId}>
+                            {burgerDetails}
                         </tr>
                     )
                 })
@@ -57,25 +69,35 @@ const OrderTable = ({ orders }) => {
             }))
 
     return (
-        <table className={styles.orderTable}>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Total price</th>
-                    <th>Burger name</th>
-                    <th>Bacon</th>
-                    <th>Cheese</th>
-                    <th>Meat</th>
-                    <th>Salad</th>
-                    <th>Amount</th>
-                    <th>Price</th>
-
-                </tr>
-            </thead>
-            <tbody>
-                {displayedOrders}
-            </tbody>
-        </table>
+        <div
+            style={{ justifyContent: 'center', display: 'flex' }}
+        >
+            <table className={styles.orderTable}>
+                <thead>
+                    <tr>
+                        <th rowSpan={2}>Date</th>
+                        <th rowSpan={2}>Total price</th>
+                        <th rowSpan={2}>Burger name</th>
+                        <th
+                            colSpan={ingredientTypes.length}
+                            style={{ textAlign: 'center' }}
+                        >
+                            Ingredients
+                    </th>
+                        <th rowSpan={2}>Amount</th>
+                        <th rowSpan={2}>Price</th>
+                    </tr>
+                    <tr>
+                        {ingredientTypes.map(ingrType => (
+                            <th key={ingrType}>{ingrType}</th>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody>
+                    {displayedOrders}
+                </tbody>
+            </table>
+        </div>
     )
 
 }

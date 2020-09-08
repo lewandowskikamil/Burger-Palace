@@ -6,7 +6,8 @@
     border: 1px solid #eee;
     box-shadow: 0 2px 3px #ccc;
 }
-.orderStats h2{
+.orderStats h2,
+.orderStats h3 {
     margin: 20px 0;
 }
 .orderStats p {

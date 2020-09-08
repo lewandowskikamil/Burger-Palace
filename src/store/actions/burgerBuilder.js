@@ -1,30 +1,26 @@
 import * as actionTypes from './actionTypes';
 
-export const addIngredient = (ingredientName) => ({
-    type: actionTypes.ADD_INGREDIENT,
-    payload: ingredientName
-})
-export const removeIngredient = (ingredientName) => ({
+export const addIngredient = (ingrName, ingredientPrice) => (dispatch, getState) => {
+    const totalPrice = getState().burger.totalPrice;
+    // if total price in burger reducer equals 0, burger configuration hasn't started yet
+    // in such a case include bun (bread) cost, which is the base price
+    // then start calculating ingredients cost
+    let ingrPrice=ingredientPrice;
+    if (!totalPrice) {
+        const basePrice = getState().firestore.data.prices.bun;
+        ingrPrice += basePrice;
+    }
+    dispatch({
+        type: actionTypes.ADD_INGREDIENT,
+        ingrName,
+        ingrPrice
+    })
+}
+export const removeIngredient = (ingrName, ingrPrice) => ({
     type: actionTypes.REMOVE_INGREDIENT,
-    payload: ingredientName
+    ingrName,
+    ingrPrice
 })
-export const clearIngredients=()=>({
-    type:actionTypes.CLEAR_INGREDIENTS
+export const clearIngredients = () => ({
+    type: actionTypes.CLEAR_INGREDIENTS
 })
-
-// export const setIngredients = (ingredients) => ({
-//     type: actionTypes.SET_INGREDIENTS,
-//     payload: ingredients
-// })
-
-// export const fetchIngredientsFailed=()=>({type:actionTypes.FETCH_INGREDIENTS_FAILED})
-
-// export const initIngredients = () => (dispatch) => {
-//     axios.get('/ingredients.json')
-//         .then(res => {
-//             dispatch(setIngredients(res.data))
-//         })
-//         .catch(err => {
-//             dispatch(fetchIngredientsFailed())
-//         })
-// }
