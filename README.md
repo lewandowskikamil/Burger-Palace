@@ -29,7 +29,7 @@ To run this project, install it locally using npm:
 npm install
 npm start
 ```
-Or [click here to check out live version](https://burger-project-fa445.firebaseapp.com)
+Or [click here to check out live version](https://burger-project-fa445.web.app/)
 
 ## Features
 As a user you can:
@@ -37,9 +37,7 @@ As a user you can:
 * add menu burgers, as well as custom ones built in Burger Builder section, to the cart
 * check out - as a result your order is added to the table in Orders section, where you can browse through your order history (applying filters is also possible) and related stats
 
-<img src='readmeImages/signup.png' height='500'>
-<img src='readmeImages/userMenu.png' height='500'>
-<img src='readmeImages/cart.png' height='500'>
+<img src='readmeImages/signup.png' height='500'> <img src='readmeImages/userMenu.png' height='500'> <img src='readmeImages/cart.png' height='500'>
 
 As an admin, apart from the actions available for the users, you can:
 * browse through all users orders
@@ -47,17 +45,13 @@ As an admin, apart from the actions available for the users, you can:
 * add new burgers to the menu
 * update/delete burgers which you previously created
 
-<img src='readmeImages/prices.png' height='500'>
-<img src='readmeImages/addToMenu.png' height='500'>
-<img src='readmeImages/orders.png' height='500'>
+<img src='readmeImages/prices.png' height='500'> <img src='readmeImages/addToMenu.png' height='500'> <img src='readmeImages/orders.png' height='500'>
 
 Super admins (inaccessible for the public), apart from the actions available for the admins, can:
 * manage permissions
 * update/delete any burger
 
-<img src='readmeImages/roles.png' height='500'>
-<img src='readmeImages/updatingroles.png' height='500'>
-<img src='readmeImages/removeFromMenu.png' height='500'>
+<img src='readmeImages/roles.png' height='500'> <img src='readmeImages/updatingroles.png' height='500'> <img src='readmeImages/removeFromMenu.png' height='500'>
 
 In order to play with the app, apart from creating your own account, you can use one of the existing accounts available for the public:
 * user@test.com, password: user1234 
