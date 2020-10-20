@@ -8,8 +8,8 @@ const BurgerIngredient = ({ type }) => {
     if (ingredients.includes(type) && type === 'breadTop') {
         ingredient = (
             <div className={styles.breadTop}>
-                <div className={styles.seeds1}></div>
-                <div className={styles.seeds2}></div>
+                <span className={styles.seeds1}></span>
+                <span className={styles.seeds2}></span>
             </div>
         )
     } else if (ingredients.includes(type)) {

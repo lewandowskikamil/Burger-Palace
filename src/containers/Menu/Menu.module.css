@@ -1,13 +1,122 @@
-.menu{
+.menu {
     text-align: center;
-    padding-bottom: 40px;
+    padding-bottom: 30px;
+    min-height:calc(100vh - 60px);
 }
-.menu h2 {
-    padding: 40px 0;
-    font-size: 30px;
-    text-transform: uppercase;
+
+.menu .portionsInfo p {
+    margin: 15px;
+    display: inline-block;
+    position: relative;
+    padding-bottom: 3px;
 }
-.menu h3{
-    padding: 30px 0;
-    font-size: 24px;
+
+.menu .portionsInfo p::after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(45deg, #e67912, #582f07);
+}
+
+.menu .portionsInfo ul {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.menu .portionsInfo svg {
+    margin-right: 5px;
+    color: #703b09;
+}
+
+.menu .portionsInfo li {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.menu .portionsInfo span {
+    text-align: left;
+}
+
+.menu .portionsInfo span:nth-child(1) {
+    width: 80px;
+}
+
+.menu .portionsInfo span:nth-child(2) {
+    margin-right: 5px;
+}
+
+.menu .portionsInfo span:nth-child(3) {
+    width: 40px;
+    text-align: right;
+}
+
+.menu .portionsInfo span:nth-child(4) {
+    width: 70px;
+    text-align: right;
+}
+
+.menu .items {
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    margin: 20px auto;
+}
+
+.menu .redirectSection {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.menu .redirectSection h2,
+.menu .redirectSection p {
+    width: 100%;
+}
+
+.menu .redirectSection h2 {
+    padding: 30px 10px 20px;
+}
+
+@media (min-width:576px) {
+    .menu .redirectSection {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+@media (min-width:992px) {
+    .menu .items {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+    .menu .items .burgerCardWrapper{
+        display: flex;
+    }
+
+    .menu .portionsInfo ul {
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .menu .portionsInfo span:nth-child(1),
+    .menu .portionsInfo span:nth-child(2),
+    .menu .portionsInfo span:nth-child(3),
+    .menu .portionsInfo span:nth-child(4) {
+        width: auto;
+        margin-right: 5px;
+    }
+
+    .menu .portionsInfo li {
+        margin: 0;
+    }
 }

@@ -1,28 +1,24 @@
 .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     height: 60px;
     width: 100%;
     position: fixed;
     left: 0;
     top: 0;
-    background-color: #703B09;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    box-sizing: border-box;
     z-index: 90;
+    padding: 0 20px;
+    background-color: #703B09;
 }
 
 .toolbar nav {
+    position: relative;
     display:none;
     height: 100%;
 }
-@media (min-width:500px){
+@media (min-width:768px){
     .toolbar nav {
         display:block;
     }
-}
-
-.logo {
-    height: 80%;
 }

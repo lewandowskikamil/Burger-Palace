@@ -1,0 +1,10 @@
+.burgerMenu {
+    font-size: 28px;
+    cursor:pointer;
+}
+
+@media(min-width:768px) {
+    .burgerMenu {
+        display: none;
+    }
+}

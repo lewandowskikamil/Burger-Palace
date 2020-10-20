@@ -19,7 +19,7 @@ const auth = (state = initialState, action) => {
             }
         case actionTypes.AUTH_FAIL:
             return {
-                loading: true,
+                loading: false,
                 error: action.error.message
             }
         default:

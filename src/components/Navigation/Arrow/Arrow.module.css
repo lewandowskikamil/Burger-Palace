@@ -1,5 +1,12 @@
 .arrow {
-    padding: 5px;
+    padding: 10px 20px 10px;
     font-size: 20px;
     line-height: 1;
+    cursor: pointer;
+    color:#703B09;
+    transition: .3s color ease-in;
+}
+
+.arrow:hover {
+    color: #40a4c8;
 }

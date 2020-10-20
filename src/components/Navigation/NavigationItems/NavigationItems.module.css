@@ -1,11 +1,99 @@
-.navigationItems{
+.navigationItems {
     display: flex;
     flex-direction: column;
     align-items: center;
     height: 100%;
 }
-@media (min-width:500px){
-    .navigationItems{
+
+@media (min-width:768px) {
+    .navigationItems {
         flex-direction: row;
+    }
+}
+
+.navigationItem {
+    position: relative;
+    overflow: hidden;
+    display: block;
+    width: 100%;
+}
+
+.navigationItem a {
+    display: block;
+    padding: 10px;
+    color: #703B09;
+    background-color: transparent;
+    text-decoration: none;
+    transition: color .3s ease-in;
+}
+
+.navigationItem span {
+    position: absolute;
+    margin: -300px 0 0 -300px;
+    width: 600px;
+    height: 600px;
+    transform: scale(0);
+    transform-origin: center;
+    border-radius: 50%;
+    background-color: rgba(248, 165, 88, .2);
+    opacity: 0;
+    z-index: -1;
+    transition: opacity .5s ease-in, transform 0s .5s;
+}
+
+.navigationItem a.active+span {
+    opacity: 1;
+    transform: scale(1);
+    transition: transform .5s linear, opacity 0s;
+}
+
+.navigationItem a:hover,
+.navigationItem a:active,
+.navigationItem a.active {
+    color: #40a4c8;
+}
+
+@media(min-width:768px) {
+    .navigationItem {
+        width: auto;
+        height: 100%;
+        margin: 0;
+    }
+
+    .navigationItem a {
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+        color: white;
+        background-color: #703B09;
+        height: 100%;
+        border-bottom: 4px solid transparent;
+        transition: background-color .3s ease;
+    }
+
+    .navigationItem a::after {
+        display: block;
+        content: '';
+        position: absolute;
+        height: 4px;
+        background-color: #40a4c8;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        transform: scaleX(0);
+        transform-origin: right;
+        transition:transform 0.3s ease-in-out;
+    }
+
+    .navigationItem a:hover,
+    .navigationItem a:active,
+    .navigationItem a.active {
+        background-color: #8f5c2c;
+        color: white;
+    }
+
+    .navigationItem a.active::after {
+        transform-origin: left;
+        transform: scaleX(1);
     }
 }

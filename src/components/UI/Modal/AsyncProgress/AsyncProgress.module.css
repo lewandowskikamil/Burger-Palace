@@ -1,0 +1,16 @@
+.asyncProgress {
+   text-align: center;
+}
+
+.asyncProgress p {
+    margin: 20px 0 0;
+    text-align: left;
+}
+.asyncProgress .btns{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+.asyncProgress .btns button{
+    margin: 20px 0 0;
+}

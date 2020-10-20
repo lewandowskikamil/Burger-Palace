@@ -1,25 +1,32 @@
 .about {
-    /* margin-top: 20vh; */
-    text-align: justify;
     color: white;
-    background: linear-gradient(#e07e41, #461b00);
-    /* width: 100%;
-    overflow: hidden;
-    max-height:calc(100vh - 72px); */
-    overflow: hidden;
+    background: linear-gradient(#e67912, #291603);
+    transform-origin: left;
 }
 
 .about h2 {
-    padding: 0 5vmax 2.5vmax 5vmax;
-    font-size: 30px;
+    padding-bottom: 15px;
+    font-size: 36px;
+    letter-spacing: .5px;
     text-transform: uppercase;
     text-align: center;
 }
 
-.about p {
+.about h3 {
     padding: 0 5vmax;
+}
+
+.about p {
+    padding: 15px 5vmax 30px;
+    text-align: justify;
 }
 
 .about svg {
     display: block;
+}
+
+@media (min-width:768px) {
+    .about h2 {
+        font-size: 44px;
+    }
 }

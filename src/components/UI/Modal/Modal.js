@@ -1,24 +1,38 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import styles from './Modal.module.css';
 import Backdrop from '../Backdrop/Backdrop';
 
-const Modal = ({ children, show, modalClosed }) => {
+const modalVariants = {
+    hidden: {
+        x: '-50%',
+        opacity: 0,
+        y: '-100vh'
+    },
+    visible: {
+        x: '-50%',
+        opacity: 1,
+        y: '-50%'
+    }
+}
+
+const Modal = ({ children, isShowed, closeModal }) => {
     return (
         <>
-            <Backdrop show={show} clicked={modalClosed} />
-            <div className={styles.modal}
-                style={{
-                    opacity: show ? '1' : '0',
-                    transform: show ? 'translateY(0)' : 'translateY(-100vh)'
-                }}
-            >
-                {children}
-            </div>
+            <Backdrop isShowed={isShowed} clicked={closeModal} />
+            <AnimatePresence>
+                {isShowed && <motion.div
+                    key='modal'
+                    className={styles.modal}
+                    variants={modalVariants}
+                    initial='hidden'
+                    animate='visible'
+                    exit='hidden'
+                >
+                    {children}
+                </motion.div>}
+            </AnimatePresence>
         </>
     );
 }
-const areEqual = (prevProps, nextProps) => (
-    prevProps.show === nextProps.show &&
-    prevProps.children === nextProps.children
-)
-export default React.memo(Modal, areEqual);
+export default Modal;

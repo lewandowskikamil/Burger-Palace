@@ -1,37 +1,88 @@
-import React from 'react';
-import NavigationItem from './NavigationItem/NavigationItem'
-import styles from './NavigationItems.module.css'
+import React, { useState } from 'react';
+import styles from './NavigationItems.module.css';
+import { NavLink } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 
-const NavigationItems = ({ isAuthed }) => {
+const NavigationItems = ({ isAuthed, userRole, clicked, mobile }) => {
+
     const { pathname: prevPath } = useLocation();
-    let navItems = (
-        <>
-            <NavigationItem to='/about'>About</NavigationItem>
-            <NavigationItem to='/menu'>Menu</NavigationItem>
-            <NavigationItem to='/' exact>Burger Builder</NavigationItem>
-            <NavigationItem to={{ pathname: '/auth', state: { prevPath } }}>Sign In</NavigationItem>
-
-        </>
-    );
-    if (isAuthed) navItems = (
-        <>
-            <NavigationItem to='/about'>About</NavigationItem>
-            <NavigationItem to='/menu'>Menu</NavigationItem>
-            <NavigationItem to='/' exact>Burger Builder</NavigationItem>
-            <NavigationItem to='/cart'>
-                <span className="fa fa-shopping-cart" style={{ fontSize: '26px' }}></span>
-            </NavigationItem>
-            <NavigationItem to='/orders'>Orders</NavigationItem>
-            <NavigationItem to={{ pathname: '/signout', state: { prevPath } }}>Sign Out</NavigationItem>
-        </>
-    );
-
+    const [waveCenter, setWaveCenter] = useState({ left: 0, top: 0 });
+    const navItemClickHandler = e => {
+        const left = e.clientX;
+        const top = e.clientY - e.target.parentNode.getBoundingClientRect().top;
+        setWaveCenter({ left, top });
+        clicked();
+    }
+    let navItemsData = [
+        {
+            label: 'About',
+            data: { to: '/', exact:true }
+        },
+        {
+            label: 'Menu',
+            data: { to: '/menu' }
+        },
+        {
+            label: 'Burger Builder',
+            data: { to: '/builder' }
+        },
+        {
+            label: 'Sign In',
+            data: {
+                to: { pathname: '/auth', state: { prevPath } }
+            }
+        }
+    ]
+    if (isAuthed) {
+        navItemsData.pop();
+        navItemsData = navItemsData.concat([
+            {
+                label: 'Cart',
+                data: { to: '/cart' }
+            },
+            {
+                label: 'Orders',
+                data: { to: '/orders' }
+            },
+            {
+                label: 'Sign Out',
+                data: {
+                    to: { pathname: '/signout', state: { prevPath } }
+                }
+            }
+        ])
+    }
+    if (isAuthed && ['admin', 'super admin'].includes(userRole)) {
+        navItemsData.push({
+            label: 'Admin',
+            data: { to: '/admin' }
+        })
+    }
+    const navItems = navItemsData.map(({ label, data }) => (
+        <li
+            className={styles.navigationItem}
+            key={label}
+        >
+            <NavLink
+                {...data}
+                activeClassName={styles.active}
+                onClick={mobile ? navItemClickHandler : () => { }}
+            >
+                {label}
+            </NavLink>
+            {mobile && <span
+                style={{
+                    left: `${waveCenter.left}px`,
+                    top: `${waveCenter.top}px`
+                }}
+            ></span>}
+        </li>
+    ))
     return (
         <ul className={styles.navigationItems}>
             {navItems}
-        </ul >
-    );
+        </ul>
+    )
 }
 
 export default NavigationItems;

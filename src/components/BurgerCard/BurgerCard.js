@@ -1,7 +1,11 @@
 import React from 'react';
 import Button from '../UI/Button/Button';
+import AmountPanel from '../UI/AmountPanel/AmountPanel';
+import Card from '../UI/Card/Card';
 import Burger from '../Burger/Burger';
 import styles from './BurgerCard.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import icons from '../../shared/icons';
 
 const BurgerCard = ({
     burgerInfo: {
@@ -10,48 +14,85 @@ const BurgerCard = ({
         description,
         price,
         amount,
-        id
+        id,
+        authorId
     },
-    btnClicked,
+    cartBtnClicked,
+    removeBtnClicked,
+    updateBtnClicked,
+    userRole,
+    userId,
     forTheCart,
-    amountIncreased,
-    amountDecreased
+    increaseAmount,
+    decreaseAmount,
 }) => {
 
-    const ingredientsInfo = []
-    if (!forTheCart) {
-        for (const ingrKey in ingredients) {
-            if (ingredients[ingrKey]) {
-                ingredientsInfo.push(`${ingrKey} (${ingredients[ingrKey]})`)
-            }
-        }
-    }
+
+    const ingredientsInfo = [...new Set(ingredients)]
+        .sort()
+        .map(uniqueIngr => (
+            `${uniqueIngr} (${ingredients.filter(ingr => ingr === uniqueIngr).length})`
+        ));
     let burgerDescription = <p className={styles.description}>{description}</p>;
-    let burgerIngredients = <p>Ingredients: {ingredientsInfo.join(', ')}</p>;
-    let addToCartBtn = (
-        <Button
-            lg
-            clicked={btnClicked}
-        >
-            Add to cart
-        </Button>
+    let burgerIngredients = (
+        <div className={styles.ingredients}>
+            <p>Ingredients:</p>
+            <ul>
+                {ingredientsInfo.map(ingr => (
+                    <li key={ingr}>
+                        <FontAwesomeIcon icon={icons.faHamburger} />{ingr}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    )
+    let menuBtns = (
+        <div className={styles.menuBtns}>
+            {
+                userRole &&
+                ['admin', 'super admin'].includes(userRole) &&
+                <Button
+                    clicked={removeBtnClicked}
+                    disabled={authorId !== userId && userRole !== 'super admin'}
+                    danger
+                    circular
+                >
+                    <FontAwesomeIcon icon={icons.faTrash} />
+                </Button>
+            }
+            <Button
+                clicked={cartBtnClicked}
+                circular
+            >
+                <FontAwesomeIcon icon={icons.faCartPlus} />
+            </Button>
+            {
+                userRole &&
+                ['admin', 'super admin'].includes(userRole) &&
+                <Button
+                    clicked={updateBtnClicked}
+                    disabled={authorId !== userId && userRole !== 'super admin'}
+                    secondary
+                    circular
+                >
+                    <FontAwesomeIcon icon={icons.faPen} />
+                </Button>
+            }
+        </div>
     )
     let amountPanel = null;
     if (forTheCart) {
         burgerDescription = null;
         burgerIngredients = null;
-        addToCartBtn = null
+        menuBtns = null
         amountPanel = (
-            <div className={styles.amountPanel}>
-                <button onClick={() => amountDecreased(id)}>
-                    <span className="fa fa-minus"></span>
-                </button>
-                <span><strong>{amount}</strong></span>
-                <button onClick={() => amountIncreased(name, ingredients)}>
-                    <span className="fa fa-plus"></span>
-                </button>
-            </div>
-        );
+            <AmountPanel
+                increaseAmount={() => increaseAmount(name, ingredients)}
+                decreaseAmount={() => decreaseAmount(id)}
+                amount={amount}
+                margin='40px 0 0 0'
+            />
+        )
     }
 
     const classes = [styles.burgerCard];
@@ -60,15 +101,26 @@ const BurgerCard = ({
 
     return (
         <div className={classes.join(' ')}>
-            <h4>{name}</h4>
-            <div className={styles.burgerWrapper}>
-                <Burger ingredients={ingredients}></Burger>
-            </div>
-            {burgerDescription}
-            {burgerIngredients}
-            {amountPanel}
-            <p className={styles.price}>Price: <span><strong>{price.toFixed(2)}</strong></span></p>
-            {addToCartBtn}
+            <Card
+                destination={forTheCart ? 'cartItem' : 'menuItem'}
+            >
+                <h2>{name}</h2>
+                <div className={styles.burgerWrapper}>
+                    <Burger
+                        ingredients={ingredients}
+                        justifyMode='flex-end'
+                    />
+                </div>
+                {burgerDescription}
+                {burgerIngredients}
+                {amountPanel}
+                <p className={styles.price}>
+                    Price: <span className='bold'>
+                        {price.toFixed(2)}
+                    </span>
+                </p>
+                {menuBtns}
+            </Card>
         </div>
     );
 }

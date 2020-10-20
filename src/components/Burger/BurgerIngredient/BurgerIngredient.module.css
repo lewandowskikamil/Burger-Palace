@@ -1,11 +1,11 @@
-/* changed classes name - prev: BreadBottom, Seeds1 etc */
 .breadBottom {
     height: 13%;
     width: 80%;
     background: linear-gradient(#F08E4A, #e27b36);
     border-radius: 0 0 30px 30px;
     box-shadow: inset -15px 0 #c15711;
-    margin: 0.5% auto;
+    margin: 0.25% auto 0;
+    flex-shrink:0;
 }
 
 .breadTop {
@@ -14,8 +14,9 @@
     background: linear-gradient(#bc581e, #e27b36);
     border-radius: 50% 50% 0 0;
     box-shadow: inset -15px 0 #c15711;
-    margin: 0 auto 0.5%;
+    margin: 0 auto 0.25%;
     position: relative;
+    flex-shrink:0;
 }
 
 .seeds1 {
@@ -86,29 +87,33 @@
     width: 80%;
     height: 8%;
     background: linear-gradient(#7f3608, #702e05);
-    margin: 0.5% auto;
+    margin: 0.25% auto;
     border-radius: 15px;
+    flex-shrink:0;
 }
 
 .cheese {
     width: 90%;
     height: 4.5%;
-    margin: 0.5% auto;
+    margin: 0.25% auto;
     background: linear-gradient(#f4d004, #d6bb22);
     border-radius: 20px;
+    flex-shrink:0;
 }
 
 .salad {
     width: 85%;
     height: 7%;
-    margin: 0.5% auto;
+    margin: 0.25% auto;
     background: linear-gradient(#228c1d, #91ce50);
     border-radius: 20px;
+    flex-shrink:0;
 }
 
 .bacon {
     width: 85%;
     height: 3%;
     background: linear-gradient(#bf3813, #c45e38);
-    margin: 0.5% auto;
+    margin: 0.25% auto;
+    flex-shrink:0;
 }

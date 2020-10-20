@@ -1,27 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { connect } from 'react-redux';
 import Input from '../../components/UI/Input/Input';
-import SlimButton from '../../components/UI/SlimButton/SlimButton';
+import Button from '../../components/UI/Button/Button';
+import IconHeading from '../../components/UI/IconHeading/IconHeading';
 import styles from './Auth.module.css';
 import * as actions from '../../store/actions';
 import Spinner from '../../components/UI/Spinner/Spinner';
-import { Redirect } from 'react-router-dom';
-import { updateObject, checkValidity } from '../../shared/utility';
+import Card from '../../components/UI/Card/Card';
+import {
+    updateObject,
+    checkValidity,
+    variantsProps,
+    containerVariants,
+    scaleVariants
+}
+    from '../../shared/utility';
+import icons from '../../shared/icons';
+
 
 const initialSignInData = {
     email: {
         elementType: 'input',
         elementLabel: 'Email',
+        elementPrefix: 'Envelope',
         elementConfig: {
             id: 'emailInput',
             type: 'email',
-            placeholder: 'Your email'
         },
         value: '',
         validation: {
             required: true,
             isEmail: true,
-            errorMessage: 'It must be a valid email, don\'t fuck with me.'
+            errorMessage: 'Invalid email format.'
         },
         valid: false,
         touched: false
@@ -29,10 +40,10 @@ const initialSignInData = {
     password: {
         elementType: 'input',
         elementLabel: 'Password',
+        elementPrefix: 'Key',
         elementConfig: {
             id: 'passwordInput',
-            type: 'password',
-            placeholder: 'Your password'
+            type: 'password'
         },
         value: '',
         validation: {
@@ -49,15 +60,15 @@ const initialSignUpData = {
     fullName: {
         elementType: 'input',
         elementLabel: 'Full name',
+        elementPrefix: 'User',
         elementConfig: {
             id: 'fullNameInput',
             type: 'text',
-            placeholder: 'Your full name'
         },
         value: '',
         validation: {
             required: true,
-            errorMessage: 'This field can\'t be empty'
+            errorMessage: 'This field can\'t be empty.'
         },
         valid: false,
         touched: false
@@ -65,15 +76,15 @@ const initialSignUpData = {
     address: {
         elementType: 'input',
         elementLabel: 'Address',
+        elementPrefix: 'Home',
         elementConfig: {
             id: 'addressInput',
             type: 'text',
-            placeholder: 'Your address'
         },
         value: '',
         validation: {
             required: true,
-            errorMessage: 'This field can\'t be empty'
+            errorMessage: 'This field can\'t be empty.'
         },
         valid: false,
         touched: false
@@ -81,10 +92,10 @@ const initialSignUpData = {
     phoneNumber: {
         elementType: 'input',
         elementLabel: 'Phone number',
+        elementPrefix: 'PhoneAlt',
         elementConfig: {
             id: 'phoneNumberInput',
             type: 'text',
-            placeholder: 'Your phone number'
         },
         value: '',
         validation: {
@@ -92,13 +103,12 @@ const initialSignUpData = {
             isNumeric: true,
             minLength: 9,
             maxLength: 9,
-            errorMessage: 'Phone number must consist of 9 digits'
+            errorMessage: 'Phone number must consist of 9 digits.'
         },
         valid: false,
         touched: false
     },
 }
-
 
 const Auth = ({
     onAuthUser,
@@ -111,12 +121,21 @@ const Auth = ({
     const initialFormData = isSignedUp ? initialSignInData : initialSignUpData;
     const [formData, setFormData] = useState(initialFormData);
     const [isFormValid, setIsFormValid] = useState(false);
+
+    useEffect(() => {
+        if (isAuthed) {
+            const { prevPath } = history.location.state || { prevPath: '/' };
+            history.replace(prevPath);
+        }
+    }, [isAuthed, history])
+
     const switchAuthModeHandler = () => {
         if (isSignedUp) setFormData(initialSignUpData);
         else setFormData(initialSignInData);
         setIsFormValid(false);
         setIsSignedUp(!isSignedUp);
     }
+
     const inputChangeHandler = (e) => {
         const { [e.target.name]: formElement } = formData;
         const updatedFormElement = updateObject(formElement, {
@@ -124,7 +143,7 @@ const Auth = ({
             valid: checkValidity(
                 e.target.value, formElement.validation
             )
-        })
+        });
         if (!updatedFormElement.touched) updatedFormElement.touched = true
         const updatedFormData = updateObject(formData, {
             [e.target.name]: updatedFormElement
@@ -169,28 +188,53 @@ const Auth = ({
             />
         ))
     let form = (
-        <form onSubmit={submitHandler}>
-            {formElementsArray}
-            <SlimButton btnType='success' disabled={!isFormValid}>{isSignedUp ? 'Sign In' : 'Sign Up'}</SlimButton>
-        </form>
+        <div>
+            <form onSubmit={submitHandler}>
+                {formElementsArray}
+                <Button disabled={!isFormValid} dark>
+                    {isSignedUp ? 'Sign In' : 'Sign Up'}
+                </Button>
+            </form>
+            <Button
+                secondary
+                noMarginTop
+                clicked={switchAuthModeHandler}
+            >
+                {isSignedUp ? 'Switch to sign up panel' : 'Switch to sign in panel'}
+            </Button>
+        </div>
     )
-    if (loading) form = <Spinner />
+    if (loading) form = <Spinner withWrapper />
     let errorMessage = null;
     if (error) errorMessage = (
-        <p>{error}</p>
+        <p className={styles.errorMessage}>{error}</p>
     )
-    if (isAuthed) {
-        const { prevPath } = history.location.state || { prevPath: '/' };
-        return <Redirect to={prevPath} />
-    }
+    let pageContent;
+    if (!isAuthed) pageContent = (
+        <motion.div
+            variants={scaleVariants}
+        >
+            <Card
+                centered
+                destination='form'
+                solePageElement
+            >
+                <IconHeading
+                    icon={icons[`fa${isSignedUp ? 'SignInAlt' : 'UserPlus'}`]}
+                />
+                {errorMessage}
+                {form}
+            </Card>
+        </motion.div>
+    )
 
     return (
-        <div className={styles.auth}>
-            <h2>{isSignedUp ? 'Sign In' : 'Sign Up'}</h2>
-            {errorMessage}
-            {form}
-            <SlimButton btnType='primary' clicked={switchAuthModeHandler}>Switch to {isSignedUp ? 'Sign Up' : 'Sign In'} Panel</SlimButton>
-        </div>
+        <motion.div
+            variants={containerVariants}
+            {...variantsProps}
+        >
+            {pageContent}
+        </motion.div>
     );
 }
 const mapStateToProps = ({

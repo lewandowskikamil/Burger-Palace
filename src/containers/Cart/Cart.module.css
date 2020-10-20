@@ -1,16 +1,12 @@
 .cart {
     text-align: center;
     padding-bottom: 40px;
-}
-
-.cart h2 {
-    padding: 40px 0;
-    font-size: 30px;
-    text-transform: uppercase;
+    min-height: calc(100vh - 60px);
 }
 
 .cartItems {
     width: 90%;
+    max-width:1400px;
     margin: 0 auto;
     display: flex;
     justify-content: center;
@@ -20,24 +16,4 @@
 .cart .totalPrice {
     font-size: 24px;
     margin-top: 30px;
-}
-
-.cart p {
-    font-size: 18px;
-}
-.leaveCartInfo h2 {
-    text-align: center;
-    color: #944317;
-    margin-bottom: 20px;
-}
-
-.leaveCartInfo p {
-    margin-bottom: 15px;
-    text-align: justify;
-}
-
-.leaveCartInfo .btns {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
 }

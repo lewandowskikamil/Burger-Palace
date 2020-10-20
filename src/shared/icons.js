@@ -1,0 +1,61 @@
+import {
+    faTag,
+    faBars,
+    faArrowLeft,
+    faArrowRight,
+    faPlus,
+    faMinus,
+    faHamburger,
+    faPen,
+    faCartPlus,
+    faTrash,
+    faEnvelope,
+    faKey,
+    faUser,
+    faHome,
+    // faMapMarkerAlt,
+    faPhoneAlt,
+    faUserPlus,
+    faSignInAlt,
+    faTruck,
+    faFilter,
+    faChartLine,
+    faTags,
+    faUserShield,
+    faArrowUp,
+    faArrowDown
+} from '@fortawesome/free-solid-svg-icons';
+import {
+    faCalendar,
+    // faCopyright
+} from '@fortawesome/free-regular-svg-icons';
+
+export default {
+    faTag,
+    faBars,
+    faArrowLeft,
+    faArrowRight,
+    faCalendar,
+    faPlus,
+    faMinus,
+    faHamburger,
+    faPen,
+    faCartPlus,
+    faTrash,
+    faEnvelope,
+    faKey,
+    faUser,
+    faHome,
+    // faMapMarkerAlt,
+    faPhoneAlt,
+    faUserPlus,
+    faSignInAlt,
+    faTruck,
+    faFilter,
+    faChartLine,
+    // faCopyright
+    faTags,
+    faUserShield,
+    faArrowUp,
+    faArrowDown
+};

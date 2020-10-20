@@ -1,37 +1,81 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../../components/UI/Button/Button';
 import BurgerCard from '../../components/BurgerCard/BurgerCard';
-import AddingConfirmation from '../../components/AddingConfirmation/AddingConfirmation';
 import Modal from '../../components/UI/Modal/Modal';
+import Card from '../../components/UI/Card/Card';
+import PageHeading from '../../components/UI/PageHeading/PageHeading';
+import AsyncProgress from '../../components/UI/Modal/AsyncProgress/AsyncProgress';
+import AuthMissing from '../../components/UI/Modal/AuthMissing/AuthMissing';
 import Spinner from '../../components/UI/Spinner/Spinner';
-import SlimButton from '../../components/UI/SlimButton/SlimButton';
 import styles from './Menu.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import icons from '../../shared/icons';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { firestoreConnect } from 'react-redux-firebase';
 import * as actions from '../../store/actions';
+import {
+    variantsProps,
+    containerVariants,
+    fadeVariants,
+    translateXVariants,
+    translateYVariants
+} from '../../shared/utility';
+
+const ingredientsPortions = [
+    {
+        name: 'bacon',
+        weight: '12g',
+        quantityEquivalent: '(1 slice)'
+    },
+    {
+        name: 'cheese',
+        weight: '14g',
+        quantityEquivalent: '(1 slice)'
+    },
+    {
+        name: 'meat',
+        weight: '150g',
+        quantityEquivalent: '(1 steak)'
+    },
+    {
+        name: 'salad',
+        weight: '8g',
+        quantityEquivalent: '(1 leaf)'
+    },
+];
 
 const Menu = ({
     history,
     onAddToCart,
+    onRemoveFromMenu,
+    onSetIngredients,
+    onSetBurgerData,
     burgers,
     cartError,
     cartLoading,
     menuError,
     menuRequested,
-    isAuthed
+    isAuthed,
+    userRole,
+    userId,
+    adminError,
+    adminLoading
 }) => {
     const [isModalShowed, setIsModalShowed] = useState(false);
-    const [addedBurger, setAddedBurger] = useState(null);
-    const addToCart = ({ name, ingredients, price }) => {
+    const [modalToShow, setModalToShow] = useState('');
+
+    const addToCart = ({ name, ingredients }, isAuthed) => {
         if (isAuthed) {
+            setModalToShow('addToCartAuthed');
             onAddToCart({ name, ingredients });
-            setAddedBurger({
-                name,
-                ingredients,
-                price
-            });
-        }
+        } else setModalToShow('addToCartUnauthed');
+        setIsModalShowed(true);
+    }
+    const removeFromMenu = (id) => {
+        setModalToShow('removeFromMenu');
+        onRemoveFromMenu(id);
         setIsModalShowed(true);
     }
     const redirectToSignIn = () => {
@@ -40,82 +84,233 @@ const Menu = ({
         }
         history.push('/auth', state);
     }
-    if (!menuRequested) return (
-        <div
-            style={{
-                margin: '100px 0',
-                display: 'flex',
-                justifyContent: 'center'
-            }}
+    const redirectToCart = () => {
+        setIsModalShowed(false);
+        history.push('/cart');
+    }
+    const redirectToBuilder = () => {
+        history.push('/builder');
+    }
+    const redirectToUpdate = ({
+        id,
+        name,
+        description,
+        ingredients,
+        price
+    }) => {
+        onSetIngredients(ingredients, price);
+        onSetBurgerData({ id, name, description });
+        redirectToBuilder();
+    }
+
+    const pageHeading = (
+        <motion.div
+            variants={translateYVariants}
+            custom={true}
         >
-            <Spinner />
-        </div>
-    )
-    if (menuError) return (
-        <div className={styles.menu}>
-            <h2>Menu</h2>
-            <div>
-                <p>Unfortunately, an error occured while trying to load menu items. Please, try again later or build your custom burger.</p>
-            </div>
+            <PageHeading>Menu</PageHeading>
+        </motion.div>
+    );
+    const redirectBtns = (
+        <>
             <Button
-                clicked={() => history.push('/')}
-                lg
+                gradient
+                clicked={redirectToBuilder}
             >
                 Build custom burger
             </Button>
-        </div>
+            {
+                userRole &&
+                ['admin', 'super admin'].includes(userRole) &&
+                <Button
+                    gradient
+                    clicked={redirectToBuilder}
+                >
+                    Add menu burger
+                </Button>
+            }
+        </>
     )
-    let modalContent = null;
-    if (isModalShowed && !isAuthed) modalContent = (
-        <div>
-            <h2 className='danger'>You're not signed in!</h2>
-            <p>Only authenticated users can add items to cart. Authentication will take you just a moment.</p>
-            <SlimButton
-                btnType='success'
-                clicked={redirectToSignIn}
+
+    let pageContent;
+    if (!menuRequested) pageContent = (
+        <motion.div
+            key='spinner'
+            variants={fadeVariants}
+            {...variantsProps}
+        >
+            <Spinner withFullPageWrapper large />
+        </motion.div>
+    )
+    else if (menuError) pageContent = (
+        <motion.div
+            key='contentFail'
+            className={styles.menu}
+            variants={fadeVariants}
+            {...variantsProps}
+        >
+            {pageHeading}
+            <motion.div
+                className={styles.redirectSection}
+                variants={translateYVariants}
+                custom={false}
             >
-                Sign In
-            </SlimButton>
-        </div>
+                <p className='info'>
+                    Unfortunately, an error occured while trying to load menu items. Please, try again later or build custom burger.
+                </p>
+                {redirectBtns}
+            </motion.div>
+        </motion.div>
+    )
+    else pageContent = (
+        <motion.div
+            key='contentSuccess'
+            className={styles.menu}
+            variants={fadeVariants}
+            {...variantsProps}
+        >
+            {pageHeading}
+            <motion.div
+                variants={translateXVariants}
+                custom={false}
+            >
+                <Card
+                    destination='portionsInfo'
+                >
+                    <div className={styles.portionsInfo}>
+                        <h2>Ingredients portions</h2>
+                        <p>One portion of:</p>
+                        <ul>
+                            {ingredientsPortions.map(({ name, weight, quantityEquivalent }) => (
+                                <li key={name}>
+                                    <span>
+                                        <FontAwesomeIcon icon={icons.faHamburger} />{name}
+                                    </span>
+                                    <span>
+                                        =
+                                    </span>
+                                    <span>
+                                        {weight}
+                                    </span>
+                                    <span>
+                                        {quantityEquivalent}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </Card>
+            </motion.div>
+            <div className={styles.items}>
+                {burgers.map((burger, index) => (
+                    <motion.div
+                        key={burger.id}
+                        variants={translateXVariants}
+                        custom={(index + 1) % 2}
+                        className={styles.burgerCardWrapper}
+                    >
+                        <BurgerCard
+                            burgerInfo={burger}
+                            cartBtnClicked={() => addToCart(burger, isAuthed)}
+                            removeBtnClicked={() => removeFromMenu(burger.id)}
+                            updateBtnClicked={() => redirectToUpdate(burger)}
+                            userRole={userRole}
+                            userId={userId}
+                        />
+                    </motion.div>
+                ))}
+            </div>
+            <motion.div
+                className={styles.redirectSection}
+                variants={translateYVariants}
+                custom={false}
+            >
+                <h2>Couldn't find a burger matching your needs?</h2>
+                {redirectBtns}
+            </motion.div>
+        </motion.div>
+    )
+
+    let modalContent;
+    if (modalToShow === 'addToCartUnauthed') modalContent = (
+        <AuthMissing btnClicked={redirectToSignIn} />
     );
-    if (isModalShowed && isAuthed) modalContent = (
-        <AddingConfirmation
-            burgerDetails={addedBurger}
-            dismissModal={() => setIsModalShowed(false)}
-            redirectToCart={() => history.push('/cart')}
+    else if (modalToShow === 'addToCartAuthed') modalContent = (
+        <AsyncProgress
             error={cartError}
             loading={cartLoading}
-            addItem={onAddToCart}
+            heading={{
+                loading: 'Updating cart...',
+                fail: 'Something went wrong!',
+                success: 'Success!'
+            }}
+            mainContent={{
+                fail: 'Unfortunately, an error occured while trying to add burger to cart.',
+                success: 'Burger has been successfully added to cart.'
+            }}
+            buttons={{
+                success: [{
+                    theme: 'success',
+                    content: 'Go to cart',
+                    clickHandler: redirectToCart
+                },
+                {
+                    theme: 'secondary',
+                    content: 'Add more burgers',
+                    clickHandler: () => setIsModalShowed(false)
+                }],
+                fail: [{
+                    theme: 'danger',
+                    content: 'Ok',
+                    clickHandler: () => setIsModalShowed(false)
+                }]
+            }}
+        />
+    )
+    else modalContent = (
+        <AsyncProgress
+            error={adminError}
+            loading={adminLoading}
+            heading={{
+                loading: 'Removing item...',
+                fail: 'Something went wrong!',
+                success: 'Success!'
+            }}
+            mainContent={{
+                fail: 'Unfortunately, an error occured while trying to remove item from menu.',
+                success: 'Item has been successfully removed from menu.'
+            }}
+            buttons={{
+                success: [{
+                    theme: 'success',
+                    content: 'Ok',
+                    clickHandler: () => setIsModalShowed(false)
+                }],
+                fail: [{
+                    theme: 'danger',
+                    content: 'Ok',
+                    clickHandler: () => setIsModalShowed(false)
+                }]
+            }}
         />
     )
 
     return (
         <>
             <Modal
-                show={isModalShowed}
-                modalClosed={() => setIsModalShowed(false)}
+                isShowed={isModalShowed}
+                closeModal={() => setIsModalShowed(false)}
             >
                 {modalContent}
             </Modal>
-            <div className={styles.menu}>
-                <h2>Menu</h2>
-                <div>
-                    {burgers.map(burger => (
-                        <BurgerCard
-                            key={burger.id}
-                            burgerInfo={burger}
-                            btnClicked={() => addToCart(burger)}
-                        />
-                    ))}
-                </div>
-                <h3>Couldn't find a burger matching your needs?</h3>
-                <Button
-                    clicked={() => history.push('/')}
-                    lg
-                >
-                    Build custom burger
-                </Button>
-            </div>
+            <motion.div
+                variants={containerVariants}
+                {...variantsProps}
+            >
+                <AnimatePresence exitBeforeEnter>
+                    {pageContent}
+                </AnimatePresence>
+            </motion.div>
         </>
     )
 }
@@ -129,17 +324,32 @@ const mapStateToProps = ({
         status,
         errors
     },
-    firebase: { auth }
+    firebase: {
+        auth,
+        profile: { role }
+    },
+    admin
 }) => ({
     cartError: error,
     cartLoading: loading,
     burgers: ordered.menu,
-    menuRequested:status.requested.menu,
-    menuError:errors.allIds.includes('menu'),
-    isAuthed: !!auth.uid
+    menuRequested: status.requested.menu,
+    menuError: errors.allIds.includes('menu'),
+    isAuthed: !!auth.uid,
+    userId: auth.uid,
+    userRole: role,
+    adminError: admin.error,
+    adminLoading: admin.loading
 })
 const mapDispatchToProps = dispatch => ({
-    onAddToCart: item => dispatch(actions.addItem(item))
+    onAddToCart: item => dispatch(actions.addItem(item)),
+    onRemoveFromMenu: id => dispatch(actions.removeMenuItem(id)),
+    onSetIngredients: (ingredients, totalPrice) => {
+        dispatch(actions.setIngredients(ingredients, totalPrice))
+    },
+    onSetBurgerData: burgerData => {
+        dispatch(actions.setBurgerData(burgerData))
+    }
 })
 export default compose(
     connect(mapStateToProps, mapDispatchToProps),

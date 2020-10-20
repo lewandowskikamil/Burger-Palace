@@ -1,22 +1,31 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import styles from './Toolbar.module.css';
 import Logo from '../../Logo/Logo';
 import NavigationItems from '../NavigationItems/NavigationItems';
-import BurgerMenu from '../BurgerMenu/BurgerMenu';
-const Toolbar = ({ opened, isAuthed }) => {
+import Bars from '../Bars/Bars';
+import { variantsProps, translateYVariants } from '../../../shared/utility';
+
+const Toolbar = ({ open, isAuthed, userRole }) => {
     return (
-        <header className={styles.toolbar}>
-            <BurgerMenu
+        <motion.header
+            className={styles.toolbar}
+            variants={translateYVariants}
+            custom={true}
+            {...variantsProps}
+        >
+            <Bars
                 color='white'
-                clicked={opened}
+                clicked={open}
             />
-            <div className={styles.logo}>
-                <Logo />
-            </div>
+            <Logo />
             <nav>
-                <NavigationItems isAuthed={isAuthed} />
+                <NavigationItems
+                    isAuthed={isAuthed}
+                    userRole={userRole}
+                />
             </nav>
-        </header>
+        </motion.header>
     );
 }
 

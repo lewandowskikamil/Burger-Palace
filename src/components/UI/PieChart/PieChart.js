@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from "d3";
 import { legendColor } from 'd3-svg-legend';
-import './PieChart.css';
+import styles from './PieChart.module.css';
+import Card from '../Card/Card';
 
 const PieChart = ({
     data,
@@ -51,7 +52,7 @@ const PieChart = ({
         legendGroup.call(legend);
         legendGroup.selectAll('text')
             .attr('fill', '#000')
-            .style("font-size", 12);
+            .style("font-size", 14);
 
         const legendItems = [...legendGroup.selectAll('g.cell')];
         const legendItemsWidth = legendItems.map(item => item.getBBox().width);
@@ -75,6 +76,13 @@ const PieChart = ({
                     item.setAttribute('transform', `translate(${x}, ${y / 2})`);
                     array[index - 1].setAttribute('transform', `translate(0, ${y / 2})`);
                 }
+                if (array.length % 2 && index === array.length - 1) {
+                    const y = legendItems[index]
+                        .getAttribute('transform')
+                        .split(', ')[1]
+                        .slice(0, -1);
+                    item.setAttribute('transform', `translate(0, ${y / 2})`);
+                }
             })
         }
         const legendHeight = Math.round(
@@ -83,7 +91,7 @@ const PieChart = ({
         const canvasTotalHeight = chartPadding + pieRadius * 2 + legendVerticalOffset + legendHeight;
         setCanvasHeight(canvasTotalHeight);
 
-        const arcTweenEnter = (d) => {
+        const arcTweenEnter = d => {
             const i = d3.interpolate(d.endAngle, d.startAngle);
 
             return t => {
@@ -91,18 +99,23 @@ const PieChart = ({
                 return createArcPath(d)
             }
         }
-        const textTweenEnter = (d, i, n) => {
+        const textTweenEnter = d => {
             const interpolator = d3.interpolate(0, d.value);
 
-            return t => d3.select(n[i]).text(format(interpolator(t)))
+            return t => format(interpolator(t))
         }
-        const arcTweenExit = (d) => {
+        const arcTweenExit = d => {
             const i = d3.interpolate(d.startAngle, d.endAngle);
 
             return t => {
                 d.startAngle = i(t);
                 return createArcPath(d);
             };
+        };
+        const textTweenExit = d => {
+            const interpolator = d3.interpolate(d.value, 0);
+
+            return t => format(interpolator(t))
         };
         const arcTweenUpdate = (d, i, n) => {
             // interpolate between the two objects
@@ -118,7 +131,7 @@ const PieChart = ({
             // update the current prop with new updated data
             n[i]._current = interpolator(1);
 
-            return t => d3.select(n[i]).text(format(interpolator(t)))
+            return t => format(interpolator(t))
         };
 
 
@@ -133,17 +146,20 @@ const PieChart = ({
             .attrTween("d", arcTweenExit);
         exitingArcGroups
             .select('text')
-            .remove();
-        exitingArcGroups.each((d, i, n) => setTimeout(() => n[i].remove(), 750));
+            .transition().duration(750)
+            .style('opacity', 0)
+            .attr("transform", d => `translate(${createArcPath.centroid({ ...d, startAngle: d.endAngle })})`)
+            .textTween(textTweenExit);
+        exitingArcGroups.each((d, i, n) => setTimeout(() => n[i].remove(), 3000));
         arcGroups
             .select('path.arc')
             .transition().duration(750)
-            .attrTween("d", (d,i,n)=>arcTweenUpdate(d,i,n));
+            .attrTween("d", (d, i, n) => arcTweenUpdate(d, i, n));
         arcGroups
             .select('text')
             .transition().duration(750)
             .attr("transform", d => `translate(${createArcPath.centroid(d)})`)
-            .tween("text", (d,i,n)=>textTweenUpdate(d,i,n));
+            .textTween((d, i, n) => textTweenUpdate(d, i, n));
 
 
         const enteringArcGroups = arcGroups
@@ -163,16 +179,16 @@ const PieChart = ({
             .attr("alignment-baseline", "middle")
             .style("fill", "#fff")
             .style("font-size", 16)
-            .each((d, i, n) => n[i]._current=d.value)
+            .each((d, i, n) => n[i]._current = d.value)
             .transition().duration(750)
             .attr("transform", d => `translate(${createArcPath.centroid(d)})`)
-            .tween("text", (d, i, n) => textTweenEnter(d, i, n));
+            .textTween(textTweenEnter);
 
     }, [data, colour, format, createArcPath, createPie, legend, canvasWidth, chartPadding, pieRadius, legendHorizontalOffset, legendVerticalOffset]);
 
     return (
-        <div>
-            <h4>{title}</h4>
+        <Card destination='stats'>
+            <h3 className={styles.chartTitle}>{title}</h3>
             <div className="canvas">
                 <svg viewBox={`0 0 ${canvasWidth} ${canvasHeight}`}>
                     <g
@@ -185,7 +201,7 @@ const PieChart = ({
                     />
                 </svg>
             </div>
-        </div>
+        </Card>
     );
 }
 

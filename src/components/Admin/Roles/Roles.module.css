@@ -1,0 +1,11 @@
+.roles {
+    text-align: center;
+}
+
+.roles table span {
+    cursor: pointer;
+}
+
+.roles .permissionTables {
+    padding: 20px 0;
+}

@@ -1,0 +1,25 @@
+.wrapper {
+    text-align: center;
+    margin: 20px;
+}
+
+.table {
+    display: inline-block;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow: auto;
+    border: none;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.table th,
+.table td {
+    border: none;
+    padding: 15px;
+    text-align: left;
+}
+
+.table tr {
+    border-bottom: 2px solid #ddd;
+}

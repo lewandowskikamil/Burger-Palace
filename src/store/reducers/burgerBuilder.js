@@ -37,6 +37,12 @@ const burger = (state = initialState, action) => {
             return changeIngredientAmount(state, action, false);
         case actionTypes.CLEAR_INGREDIENTS:
             return initialState
+        case actionTypes.SET_INGREDIENTS:
+            return {
+                ingredients: action.ingredients,
+                totalPrice: action.totalPrice,
+                purchasable: true
+            }
         default:
             return state;
     }

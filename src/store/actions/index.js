@@ -1,8 +1,8 @@
 export {
     addIngredient,
     removeIngredient,
-    clearIngredients
-
+    clearIngredients,
+    setIngredients
 } from './burgerBuilder';
 export {
     makeOrder,
@@ -21,3 +21,12 @@ export {
     removeItem,
     clearCart
 } from './cart';
+export {
+    updatePrices,
+    changeRole,
+    addMenuItem,
+    removeMenuItem,
+    updateMenuItem,
+    setBurgerData,
+    clearBurgerData
+} from './admin';

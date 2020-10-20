@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './Arrow.module.css';
-import PropTypes from 'prop-types';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import icons from '../../../shared/icons';
 
 const Arrow = ({ clicked, color, direction }) => {
     return (
@@ -11,15 +12,11 @@ const Arrow = ({ clicked, color, direction }) => {
             onClick={clicked}
             className={styles.arrow}
         >
-            <span
-                className={`fa fa-arrow-${direction} icon`}
-            ></span>
+            <FontAwesomeIcon
+                icon={icons[`faArrow${direction}`]}
+            />
         </div>
     )
 }
-Arrow.propTypes = {
-    color: PropTypes.string,
-    direction: PropTypes.oneOf(['left', 'right']).isRequired,
-    clicked: PropTypes.func.isRequired,
-}
+
 export default Arrow;

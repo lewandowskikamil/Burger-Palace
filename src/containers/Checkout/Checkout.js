@@ -1,30 +1,36 @@
 import React, { useState } from 'react';
-import { Redirect } from 'react-router-dom';
-import SlimButton from '../../components/UI/SlimButton/SlimButton';
-import Spinner from '../../components/UI/Spinner/Spinner';
+import { motion } from 'framer-motion';
+import Button from '../../components/UI/Button/Button';
 import Modal from '../../components/UI/Modal/Modal';
+import AsyncProgress from '../../components/UI/Modal/AsyncProgress/AsyncProgress';
 import Input from '../../components/UI/Input/Input';
-import styles from './Checkout.module.css';
+import Card from '../../components/UI/Card/Card';
+import IconHeading from '../../components/UI/IconHeading/IconHeading';
 import { connect } from 'react-redux';
-import { compose } from 'redux';
-import { firestoreConnect } from 'react-redux-firebase';
 import * as actions from '../../store/actions';
-import { updateObject, checkValidity } from '../../shared/utility';
+import {
+    updateObject,
+    checkValidity,
+    variantsProps,
+    containerVariants,
+    scaleVariants
+} from '../../shared/utility';
+import icons from '../../shared/icons';
 
 
 const initialFormData = {
     fullName: {
         elementType: 'input',
         elementLabel: 'Full name',
+        elementPrefix: 'User',
         elementConfig: {
             id: 'fullNameInput',
-            type: 'text',
-            placeholder: 'Your full name'
+            type: 'text'
         },
         value: '',
         validation: {
             required: true,
-            errorMessage: 'This field can\'t be empty'
+            errorMessage: 'This field can\'t be empty.'
         },
         valid: false,
         touched: false
@@ -32,15 +38,15 @@ const initialFormData = {
     address: {
         elementType: 'input',
         elementLabel: 'Address',
+        elementPrefix: 'Home',
         elementConfig: {
             id: 'addressInput',
-            type: 'text',
-            placeholder: 'Your address'
+            type: 'text'
         },
         value: '',
         validation: {
             required: true,
-            errorMessage: 'This field can\'t be empty'
+            errorMessage: 'This field can\'t be empty.'
         },
         valid: false,
         touched: false
@@ -48,10 +54,10 @@ const initialFormData = {
     phoneNumber: {
         elementType: 'input',
         elementLabel: 'Phone number',
+        elementPrefix: 'PhoneAlt',
         elementConfig: {
             id: 'phoneNumberInput',
-            type: 'text',
-            placeholder: 'Your phone number'
+            type: 'text'
         },
         value: '',
         validation: {
@@ -59,7 +65,7 @@ const initialFormData = {
             isNumeric: true,
             minLength: 9,
             maxLength: 9,
-            errorMessage: 'Phone number must consist of 9 digits'
+            errorMessage: 'Phone number must consist of 9 digits.'
         },
         valid: false,
         touched: false
@@ -71,9 +77,6 @@ const Checkout = ({
     orderError,
     orderLoading,
     profile,
-    cartBurgers,
-    cartBurgersRequested,
-    cartBurgersError,
     history
 }) => {
     for (const inputIdentifier in initialFormData) {
@@ -121,23 +124,10 @@ const Checkout = ({
             setIsFormValid(isFormValid);
         }
     }
-    const dismissModal = (orderError, orderLoading) => {
+    const closeModal = (orderError, orderLoading) => {
         setIsModalShowed(false);
         if (!orderError && !orderLoading) history.push('/');
     }
-
-    if (!cartBurgersRequested) return (
-        <div
-            style={{
-                margin: '100px 0',
-                display: 'flex',
-                justifyContent: 'center'
-            }}
-        >
-            <Spinner />
-        </div>
-    )
-    if (cartBurgersError || !cartBurgers.length) return <Redirect to='/' />
 
     const formElementsArray = Object.keys(formData)
         .map(elKey => ({
@@ -157,56 +147,60 @@ const Checkout = ({
     const form = (
         <form onSubmit={submitOrder}>
             {formElementsArray}
-            <SlimButton btnType='success' disabled={!isFormValid}>Order</SlimButton>
+            <Button secondary disabled={!isFormValid}>Order</Button>
         </form>
-    )
-    const makeOrderProgress = (
-        <div>
-            {/* modal heading */}
-            {orderLoading && <h2 className='primary'>Processing order...</h2>}
-            {orderError && <h2 className='danger'>Something went wrong!</h2>}
-            {(!orderError && !orderLoading) && <h2 className='success'>Success!</h2>}
-            {/* modal main content */}
-            {orderLoading && <div
-                style={{
-                    margin: '100px 0',
-                    display: 'flex',
-                    justifyContent: 'center'
-                }}
-            >
-                <Spinner />
-            </div>}
-            {orderError && <p>Unfortunately, an error occured, while trying to process your order.</p>}
-            {(!orderError && !orderLoading) && <p>Your order has been successfully made.</p>}
-            {/* modal footer with action buttons */}
-            {orderError && (
-                <SlimButton
-                    btnType='danger'
-                    clicked={() => dismissModal(orderError, orderLoading)}
-                >
-                    Ok
-                </SlimButton>
-            )}
-            {(!orderError && !orderLoading) && <SlimButton
-                btnType='success'
-                clicked={() => dismissModal(orderError, orderLoading)}
-            >
-                Ok
-            </SlimButton>}
-        </div>
     )
     return (
         <>
             <Modal
-                show={isModalShowed}
-                modalClosed={() => dismissModal(orderError, orderLoading)}
+                isShowed={isModalShowed}
+                closeModal={() => closeModal(orderError, orderLoading)}
             >
-                {makeOrderProgress}
+                <AsyncProgress
+                    error={orderError}
+                    loading={orderLoading}
+                    heading={{
+                        loading: 'Processing order...',
+                        fail: 'Something went wrong!',
+                        success: 'Success!'
+                    }}
+                    mainContent={{
+                        fail: 'Unfortunately, an error occured while trying to process your order.',
+                        success: 'Your order has been successfully made.'
+                    }}
+                    buttons={{
+                        success: [{
+                            theme: 'success',
+                            content: 'Ok',
+                            clickHandler: () => closeModal(orderError, orderLoading)
+                        }],
+                        fail: [{
+                            theme: 'danger',
+                            content: 'Ok',
+                            clickHandler: () => closeModal(orderError, orderLoading)
+                        }]
+                    }}
+                />
             </Modal>
-            <div className={styles.contactData}>
-                <h2>Enter delivery data</h2>
-                {form}
-            </div>
+            <motion.div
+                variants={containerVariants}
+                {...variantsProps}
+            >
+                <motion.div
+                    variants={scaleVariants}
+                >
+                    <Card
+                        centered
+                        destination='form'
+                        solePageElement
+                    >
+                        <IconHeading
+                            icon={icons.faTruck}
+                        />
+                        {form}
+                    </Card>
+                </motion.div>
+            </motion.div>
         </>
     );
 }
@@ -217,20 +211,12 @@ const mapStateToProps = ({
         auth: {
             uid
         }
-    },
-    firestore: {
-        ordered,
-        status,
-        errors
     }
 }) => ({
     orderError: error,
     orderLoading: loading,
     cartId: uid,
-    profile,
-    cartBurgers: ordered.cartBurgers,
-    cartBurgersRequested: status.requested.cartBurgers,
-    cartBurgersError: errors.allIds.includes('cartBurgers')
+    profile
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -239,16 +225,4 @@ const mapDispatchToProps = dispatch => ({
     }
 })
 
-export default compose(
-    connect(mapStateToProps, mapDispatchToProps),
-    firestoreConnect(props => [
-        {
-            collection: 'carts',
-            doc: props.cartId,
-            subcollections: [{
-                collection: 'cartBurgers',
-                where: [['userId', '==', `${props.cartId}`]]
-            }],
-            storeAs: 'cartBurgers'
-        },
-    ]))(Checkout);
+export default connect(mapStateToProps, mapDispatchToProps)(Checkout);

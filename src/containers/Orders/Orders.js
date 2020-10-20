@@ -1,13 +1,22 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { firestoreConnect } from 'react-redux-firebase';
-import OrderTable from '../../components/Order/OrderTable/OrderTable';
-import OrderFilters from '../../components/Order/OrderFilters/OrderFilters';
-import OrderStats from '../../components/Order/OrderStats/OrderStats';
+import OrderTable from '../../components/Orders/OrderTable/OrderTable';
+import OrderFilters from '../../components/Orders/OrderFilters/OrderFilters';
+import OrderStats from '../../components/Orders/OrderStats/OrderStats';
 import Spinner from '../../components/UI/Spinner/Spinner';
+import PageHeading from '../../components/UI/PageHeading/PageHeading';
 import * as actions from '../../store/actions';
-import styles from './Orders.module.css';
+import {
+    variantsProps,
+    containerVariants,
+    fadeVariants,
+    translateXVariants,
+    translateYVariants,
+    scaleXVariants
+} from '../../shared/utility';
 
 const Orders = ({
     onFilterOrders,
@@ -25,59 +34,132 @@ const Orders = ({
     ordersBurgersRequested,
     ordersBurgersError,
     orders,
-    ordersBurgers,
-    areStatsCalculated
+    ordersBurgers
 }) => {
 
-    if (!ordersRequested || !ordersBurgersRequested) return (
-        <div
-            style={{
-                margin: '100px 0',
-                display: 'flex',
-                justifyContent: 'center'
-            }}
+    const pageHeading = (
+        <motion.div
+            variants={translateYVariants}
+            custom={true}
         >
-            <Spinner />
-        </div>
+            <PageHeading>Cart</PageHeading>
+        </motion.div>
+    );
+    let pageContent;
+    if (!ordersRequested || !ordersBurgersRequested) pageContent = (
+        <motion.div
+            key='spinner'
+            variants={fadeVariants}
+            {...variantsProps}
+        >
+            <Spinner withFullPageWrapper large />
+        </motion.div>
     )
-    if (ordersError || ordersBurgersError) return (
-        <>
-            <h2 className={styles.pageHeading}>Orders</h2>
-            <div>
-                <p>Unfortunately an error occured while trying to load your orders. Sorry for the inconvenience. Try again later.</p>
-            </div>
-        </>
+    else if (ordersError || ordersBurgersError) pageContent = (
+        <motion.div
+            key='contentFail'
+            variants={fadeVariants}
+            {...variantsProps}
+        >
+            {pageHeading}
+            <motion.p
+                className='info'
+                variants={scaleXVariants}
+            >
+                Unfortunately an error occured while trying to load your orders. Sorry for the inconvenience. Try again later.
+            </motion.p>
+        </motion.div>
     )
-    if (!orders.length) return (
-        <>
-            <h2 className={styles.pageHeading}>Orders</h2>
-            <div>
-                <p>There are no orders yet.</p>
-            </div>
-        </>
+    else if (!orders.length) pageContent = (
+        <motion.div
+            key='contentEmpty'
+            variants={fadeVariants}
+            {...variantsProps}
+
+        >
+            {pageHeading}
+            <motion.p
+                className='info'
+                variants={scaleXVariants}
+            >
+                There are no orders yet.
+            </motion.p>
+        </motion.div>
+    )
+    else pageContent = (
+        <motion.div
+            key='contentSuccess'
+            variants={fadeVariants}
+            {...variantsProps}
+        >
+            {pageHeading}
+            <motion.div
+                variants={translateXVariants}
+                custom={true}
+            >
+                <OrderFilters
+                    savedFilters={savedFilters}
+                    filterOrders={onFilterOrders}
+                    setOrdersFilters={onSetOrdersFilters}
+                    orders={orders}
+                    ordersBurgers={ordersBurgers}
+                    userRole={userRole}
+                    userId={userId}
+                />
+            </motion.div>
+            <motion.div
+                variants={translateXVariants}
+                custom={false}
+            >
+                <AnimatePresence exitBeforeEnter>
+                    {filteredOrders.length ? (
+                        <motion.div
+                            key='orderTable'
+                            variants={containerVariants}
+                            {...variantsProps}
+                        >
+                            <OrderTable
+                                filteredOrders={filteredOrders}
+                                filteredOrdersBurgers={filteredOrdersBurgers}
+                            />
+                        </motion.div>
+                    ) : (
+                            <motion.p
+                                key='noMatchingOrders'
+                                className='info'
+                                variants={containerVariants}
+                                {...variantsProps}
+                            >
+                                There are no matching orders.
+                            </motion.p>
+                        )}
+                </AnimatePresence>
+            </motion.div>
+            <AnimatePresence>
+                {Boolean(filteredOrders.length) && <motion.div
+                    variants={fadeVariants}
+                    {...variantsProps}
+                >
+                    <OrderStats
+                        key='orderStats'
+                        ordersStats={ordersStats}
+                        filteredOrders={filteredOrders}
+                        ordersBurgersStats={ordersBurgersStats}
+                        calculateOrdersStats={onCalculateOrdersStats}
+                    />
+                </motion.div>}
+            </AnimatePresence>
+        </motion.div>
     )
     return (
-        <>
-            <h2 className={styles.pageHeading}>Orders</h2>
-            <OrderFilters
-                savedFilters={savedFilters}
-                filterOrders={onFilterOrders}
-                setOrdersFilters={onSetOrdersFilters}
-                orders={orders}
-                ordersBurgers={ordersBurgers}
-            />
-            <OrderStats
-                ordersStats={ordersStats}
-                filteredOrders={filteredOrders}
-                ordersBurgersStats={ordersBurgersStats}
-                calculateOrdersStats={onCalculateOrdersStats}
-                areStatsCalculated={areStatsCalculated}
-            />
-            <OrderTable
-                filteredOrders={filteredOrders}
-                filteredOrdersBurgers={filteredOrdersBurgers}
-            />
-        </>
+        <motion.div
+            variants={containerVariants}
+            {...variantsProps}
+        >
+            <AnimatePresence exitBeforeEnter>
+                {pageContent}
+            </AnimatePresence>
+        </motion.div>
     )
 }
 
@@ -87,12 +169,11 @@ const mapStateToProps = ({
         filteredOrders,
         filteredOrdersBurgers,
         ordersStats,
-        ordersBurgersStats,
-        areStatsCalculated
+        ordersBurgersStats
     },
     firebase: {
         auth: { uid },
-        profile
+        profile: { role }
     },
     firestore: {
         ordered,
@@ -106,19 +187,18 @@ const mapStateToProps = ({
     ordersStats,
     ordersBurgersStats,
     userId: uid,
-    userRole: profile.isLoaded && profile.role,
+    userRole: role,
     ordersRequested: status.requested.orders,
     ordersError: errors.allIds.includes('orders'),
     ordersBurgersRequested: status.requested.ordersBurgers,
     ordersBurgersError: errors.allIds.includes('ordersBurgers'),
     orders: ordered.orders,
-    ordersBurgers: ordered.ordersBurgers,
-    areStatsCalculated
+    ordersBurgers: ordered.ordersBurgers
 });
 
 const mapDispatchToProps = dispatch => ({
-    onFilterOrders: (orders, ordersBurgers) => {
-        dispatch(actions.filterOrders(orders, ordersBurgers))
+    onFilterOrders: (orders, ordersBurgers, userRole, userId) => {
+        dispatch(actions.filterOrders(orders, ordersBurgers, userRole, userId))
     },
     onSetOrdersFilters: filters => {
         dispatch(actions.setOrdersFilters(filters))
@@ -133,8 +213,7 @@ export default compose(
     firestoreConnect(props => {
         let ordersQuery;
         let orderBurgersQuery;
-        if (!props.userRole) return []
-        else if (props.userRole === 'user') {
+        if (props.userRole === 'user') {
             ordersQuery = {
                 collection: 'orders',
                 where: [['userId', '==', `${props.userId}`]],
@@ -155,39 +234,5 @@ export default compose(
                 storeAs: 'ordersBurgers'
             }
         }
-        // define orders query and orderBurgers query
-        // get user orders&burgers or get 'em all (if you're admin/super admin)
         return [ordersQuery, orderBurgersQuery]
     }))(Orders);
-
-
-
-    // let ordersToShow = <p>There are no orders matching below filters.</p>;
-    // let orderStatsToShow = <p>There are no stats to show.</p>;
-
-    // if (filteredOrders.length) {
-    //     ordersToShow = <OrderTable orders={filteredOrders} />;
-    //     orderStatsToShow = <OrderStats {...orderStats} />;
-    // }
-
-    // let displayedOrders = orders.length ? (
-    //     <>
-    //         {ordersToShow}
-    //         <OrderFilters onFilterOrders={onFilterOrders} />
-    //         {orderStatsToShow}
-    //     </>
-    // ) : (
-    //         <p>There are no orders to show.</p>
-    //     )
-
-    // if (error) displayedOrders = (
-    //     <p>Something went wrong, please try again later.</p>
-    // )
-    // if (loading) displayedOrders = <Spinner />
-
-    // return (
-    //     <div className={styles.orders}>
-    //         <h2>Orders</h2>
-    //         {displayedOrders}
-    //     </div>
-    // )

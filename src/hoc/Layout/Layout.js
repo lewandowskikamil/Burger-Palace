@@ -4,24 +4,21 @@ import styles from './Layout.module.css';
 import Toolbar from '../../components/Navigation/Toolbar/Toolbar'
 import SideDrawer from '../../components/Navigation/SideDrawer/SideDrawer';
 
-const Layout = ({ children, isAuthed }) => {
-    const [showSideDrawer, setShowSideDrawer] = useState(false);
-    const closeSideDrawer = () => {
-        setShowSideDrawer(false)
-    }
-    const openSideDrawer = () => {
-        setShowSideDrawer(true)
-    }
+const Layout = ({ children, isAuthed, userRole }) => {
+    const [isSideDrawerShowed, setIsSideDrawerShowed] = useState(false);
     return (
         <>
+
             <Toolbar
-                opened={openSideDrawer}
+                open={() => setIsSideDrawerShowed(true)}
                 isAuthed={isAuthed}
+                userRole={userRole}
             />
             <SideDrawer
-                closed={closeSideDrawer}
-                open={showSideDrawer}
+                close={() => setIsSideDrawerShowed(false)}
+                isShowed={isSideDrawerShowed}
                 isAuthed={isAuthed}
+                userRole={userRole}
             />
             <main className={styles.content}>
                 {children}
@@ -30,6 +27,14 @@ const Layout = ({ children, isAuthed }) => {
     );
 }
 
-const mapStateToProps = ({ firebase: { auth } }) => ({ isAuthed: !!auth.uid });
+const mapStateToProps = ({
+    firebase: {
+        auth: { uid },
+        profile: { role }
+    }
+}) => ({
+    isAuthed: !!uid,
+    userRole: role
+});
 
 export default connect(mapStateToProps)(Layout);

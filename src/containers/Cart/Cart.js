@@ -1,19 +1,28 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { firestoreConnect } from 'react-redux-firebase';
 import * as actions from '../../store/actions';
 import BurgerCard from '../../components/BurgerCard/BurgerCard';
 import Button from '../../components/UI/Button/Button';
-import SlimButton from '../../components/UI/SlimButton/SlimButton';
+import PageHeading from '../../components/UI/PageHeading/PageHeading';
 import Modal from '../../components/UI/Modal/Modal';
+import AsyncProgress from '../../components/UI/Modal/AsyncProgress/AsyncProgress';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import styles from './Cart.module.css';
+import {
+    variantsProps,
+    containerVariants,
+    fadeVariants,
+    translateXVariants,
+    translateYVariants,
+    scaleXVariants
+} from '../../shared/utility';
 
 const Cart = ({
     onAddItem,
     onRemoveItem,
-    onClearCart,
     cartUpdateError,
     cartUpdateLoading,
     cartFetchError,
@@ -35,104 +44,142 @@ const Cart = ({
         onRemoveItem(id);
     }
 
-    if (!cartFetchRequested || !cartBurgersFetchRequested) return (
-        <div
-            style={{
-                margin: '100px 0',
-                display: 'flex',
-                justifyContent: 'center'
-            }}
+    const isOneRow = window.matchMedia('(max-width: 755px)');
+
+    const pageHeading = (
+        <motion.div
+            variants={translateYVariants}
+            custom={true}
         >
-            <Spinner />
-        </div>
+            <PageHeading>Cart</PageHeading>
+        </motion.div>
+    );
+    let pageContent;
+    if (!cartFetchRequested || !cartBurgersFetchRequested) pageContent = (
+        <motion.div
+            key='spinner'
+            variants={fadeVariants}
+            {...variantsProps}
+        >
+            <Spinner withFullPageWrapper large />
+        </motion.div>
     )
-    if (cartFetchError || cartBurgersFetchError) return (
-        <div className={styles.cart}>
-            <h2>Cart</h2>
+    else if (cartFetchError || cartBurgersFetchError) pageContent = (
+        <motion.div
+            key='contentFail'
+            className={styles.cart}
+            variants={fadeVariants}
+            {...variantsProps}
+        >
+            {pageHeading}
+
+            <motion.p
+                className='info'
+                variants={scaleXVariants}
+            >
+                Unfortunately an error occured while trying to load your cart. Sorry for the inconvenience. Try again later.
+            </motion.p>
+        </motion.div>
+    )
+    else if (!cartBurgers.length) pageContent = (
+        <motion.div
+            key='contentEmpty'
+            className={styles.cart}
+            variants={fadeVariants}
+            {...variantsProps}
+
+        >
+            {pageHeading}
+            <motion.p
+                className='info'
+                variants={scaleXVariants}
+            >
+                Your cart is empty.
+            </motion.p>
+        </motion.div>
+    )
+    else pageContent = (
+        <motion.div
+            key='contentSuccess'
+            className={styles.cart}
+            variants={fadeVariants}
+            {...variantsProps}
+        >
+            {pageHeading}
             <div className={styles.cartItems}>
-                <p>Unfortunately an error occured while trying to load your cart. Sorry for the inconvenience. Try again later.</p>
+                {cartBurgers.map((burger, index) => (
+                    <motion.div
+                        key={burger.id}
+                        variants={translateXVariants}
+                        custom={((index + 1) % 2) && isOneRow.matches}
+                    >
+                        <BurgerCard
+                            forTheCart
+                            increaseAmount={increaseBurgerAmount}
+                            decreaseAmount={decreaseBurgerAmount}
+                            burgerInfo={burger}
+                        />
+                    </motion.div>
+                ))}
             </div>
-        </div>
-    )
-    if (!cartBurgers.length) return (
-        <div className={styles.cart}>
-            <h2>Cart</h2>
-            <div className={styles.cartItems}>
-                <p>Your cart is empty.</p>
-            </div>
-        </div>
-    )
-    const updateCartProgress = (
-        <div>
-            {/* modal heading */}
-            {cartUpdateLoading && <h2 className='primary'>Updating cart...</h2>}
-            {cartUpdateError && <h2 className='danger'>Something went wrong!</h2>}
-            {(!cartUpdateError && !cartUpdateLoading) && <h2 className='success'>Success!</h2>}
-            {/* modal main content */}
-            {cartUpdateLoading && <div
-                style={{
-                    margin: '100px 0',
-                    display: 'flex',
-                    justifyContent: 'center'
-                }}
+            <motion.div
+                variants={translateYVariants}
+                custom={false}
             >
-                <Spinner />
-            </div>}
-            {cartUpdateError && <p>Unfortunately, an error occured, while trying to update your cart.</p>}
-            {(!cartUpdateError && !cartUpdateLoading) && <p>Your cart has been successfully updated.</p>}
-            {/* modal footer with action buttons */}
-            {cartUpdateError && (
-                <SlimButton
-                    btnType='danger'
-                    clicked={() => setIsModalShowed(false)}
-                >
-                    Ok
-                </SlimButton>
-            )}
-            {(!cartUpdateError && !cartUpdateLoading) && <SlimButton
-                btnType='success'
-                clicked={() => setIsModalShowed(false)}
-            >
-                Ok
-            </SlimButton>}
-        </div>
-    )
-    const cartItems = cartBurgers.map(burger => (
-        <BurgerCard
-            key={burger.id}
-            forTheCart
-            amountIncreased={increaseBurgerAmount}
-            amountDecreased={decreaseBurgerAmount}
-            burgerInfo={burger}
-        />
-    ))
-    return (
-        <>
-            <Modal
-                show={isModalShowed}
-                modalClosed={() => setIsModalShowed(false)}
-            >
-                {isModalShowed && updateCartProgress}
-            </Modal>
-            <div className={styles.cart}>
-                <h2>Cart</h2>
-                <div className={styles.cartItems}>
-                    {cartItems}
-                </div>
                 <p className={styles.totalPrice}>
-                    Total price: <span>
-                        <strong>
-                            {cart[0].totalPrice.toFixed(2)}
-                        </strong>
+                    Total price: <span className='bold'>
+                        {cart[0].totalPrice.toFixed(2)}
                     </span>
                 </p>
                 <Button
-                    lg
                     clicked={() => history.push('/checkout')}
+                    gradient
                 >
                     Next
                 </Button>
-            </div>
+            </motion.div>
+        </motion.div >
+    )
+    return (
+        <>
+            <Modal
+                isShowed={isModalShowed}
+                closeModal={() => setIsModalShowed(false)}
+            >
+                <AsyncProgress
+                    error={cartUpdateError}
+                    loading={cartUpdateLoading}
+                    heading={{
+                        loading: 'Updating cart...',
+                        fail: 'Something went wrong!',
+                        success: 'Success!'
+                    }}
+                    mainContent={{
+                        fail: 'Unfortunately, an error occured while trying to update cart.',
+                        success: 'Cart has been successfully updated.'
+                    }}
+                    buttons={{
+                        success: [{
+                            theme: 'success',
+                            content: 'Ok',
+                            clickHandler: () => setIsModalShowed(false)
+                        }],
+                        fail: [{
+                            theme: 'danger',
+                            content: 'Ok',
+                            clickHandler: () => setIsModalShowed(false)
+                        }]
+                    }}
+                />
+            </Modal>
+            <motion.div
+                variants={containerVariants}
+                {...variantsProps}
+            >
+                <AnimatePresence exitBeforeEnter>
+                    {pageContent}
+                </AnimatePresence>
+            </motion.div>
         </>
     )
 }
@@ -164,8 +211,7 @@ const mapStateToProps = ({
 
 const mapDispatchToProps = dispatch => ({
     onAddItem: item => dispatch(actions.addItem(item)),
-    onRemoveItem: itemId => dispatch(actions.removeItem(itemId)),
-    onClearCart: () => dispatch(actions.clearCart())
+    onRemoveItem: itemId => dispatch(actions.removeItem(itemId))
 })
 export default compose(
     connect(mapStateToProps, mapDispatchToProps),

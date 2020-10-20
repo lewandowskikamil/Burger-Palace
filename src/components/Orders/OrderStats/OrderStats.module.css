@@ -1,0 +1,45 @@
+.orderStats {
+    margin: 0 auto 20px;
+    display: flex;
+    flex-direction: column;
+    max-width: 960px;
+}
+
+.orderStats .innerWrapper {
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+}
+
+.orderStats p {
+    line-height: 200%;
+    text-align: left;
+}
+
+.orderStats span {
+    margin: 0 5px;
+}
+
+@media (min-width:992px) {
+    .orderStats .overallStatsWrapper {
+        display: flex;
+    }
+    .orderStats .chartWrapper {
+        display: flex;
+    }
+
+    .orderStats {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .orderStats .innerWrapper {
+        height: 100%;
+        font-size: 18px;
+    }
+
+    .orderStats>* {
+        margin: 20px;
+    }
+}

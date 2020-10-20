@@ -8,6 +8,7 @@ const initialState = {
         endDate: '',
         startPrice: '',
         endPrice: '',
+        showAll: true
     },
     filteredOrders: [],
     filteredOrdersBurgers: [],
@@ -22,19 +23,19 @@ const initialState = {
             customBurgers: {}
         },
         burgersContribution: {}
-    },
-    areStatsCalculated:false
+    }
 }
 
 
 
-const filterOrders = (state, { orders, ordersBurgers }) => {
-    const { savedFilters: { startDate, endDate, startPrice, endPrice } } = state;
+const filterOrders = (state, { orders, ordersBurgers, userRole, userId }) => {
+    const { savedFilters: { startDate, endDate, startPrice, endPrice, showAll } } = state;
     let filteredOrders = orders
-        .map(({ id, orderTimestamp: { seconds }, totalPrice }) => ({
+        .map(({ id, orderTimestamp: { seconds }, totalPrice, userId }) => ({
             id,
             timestamp: seconds * 1000,
-            orderPrice: totalPrice
+            orderPrice: totalPrice,
+            userId
         }))
     // get timezone offset in ms
     const timezoneOffset = new Date().getTimezoneOffset() * 60 * 1000;
@@ -59,11 +60,13 @@ const filterOrders = (state, { orders, ordersBurgers }) => {
             Number(orderPrice.toFixed(2)) <= Number(endPrice)
         ))
     }
+    if (!showAll && ['admin', 'super admin'].includes(userRole)) {
+        filteredOrders = filteredOrders.filter(order => order.userId === userId)
+    }
 
     const filteredOrdersIds = filteredOrders.map(({ id }) => id);
     const filteredOrdersBurgers = ordersBurgers
         .filter(({ orderId }) => filteredOrdersIds.includes(orderId))
-    // .map(burger => ({ ...burger, ingredients: [...burger.ingredients] }));
 
     return updateObject(state, {
         filteredOrders,
@@ -156,8 +159,7 @@ const calculateOrdersStats = state => {
 
     return updateObject(state, {
         ordersStats,
-        ordersBurgersStats,
-        areStatsCalculated:true
+        ordersBurgersStats
     })
 }
 const setOrdersFilters = (state, { filters }) => updateObject(state, {

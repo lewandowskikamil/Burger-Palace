@@ -54,7 +54,7 @@ export const auth = (
                     fullName,
                     address,
                     phoneNumber,
-                    role:'user'
+                    role: 'user'
                 })
             })
             .then(() => dispatch(authSuccess()))

@@ -1,30 +1,269 @@
-.input {
+.wrapper {
+    --prefix-width: 40px;
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding: 10px;
+    padding: 10px 5px;
 }
-.errorMessage{
-    margin-top: 5px;
+
+.errorMessage {
+    margin-top: 6px;
     text-align: left;
-    font-size: 10px;
+    font-size: 12px;
+    color: #dc3545;
+}
+
+.alphanumOrDate.withPrefix+.errorMessage {
+    margin-left: var(--prefix-width);
+}
+
+/* alphanumeric and date inputs */
+
+.alphanumOrDate {
+    position: relative;
+    height: 50px;
+}
+
+.alphanumOrDate .prefix {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: var(--prefix-width);
+    padding: 0 10px 2px 0;
+    line-height: 1;
+    font-size: 26px;
+    color: #412205;
+    transition: color .3s ease;
+}
+
+.alphanumOrDate:focus-within .prefix {
+    color: #40a4c8;
+}
+
+.alphanumOrDate:focus-within.invalid .prefix {
+    color: #dc3545;
+}
+
+.alphanumOrDate .input {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.alphanumOrDate.withPrefix .input {
+    left: var(--prefix-width);
+}
+
+.alphanumOrDate .input::before,
+.alphanumOrDate .input::after {
+    display: block;
+    position: absolute;
+    content: '';
+    height: 2px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.alphanumOrDate .input::before {
+    background-color: #777;
+    transition: background-color .3s ease;
+}
+
+.alphanumOrDate.invalid .input::before {
+    background-color: #dc3545;
+}
+
+.alphanumOrDate .input::after {
+    background-color: #40a4c8;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform .3s ease-in-out, background-color .3s ease;
+}
+
+.alphanumOrDate.invalid .input::after {
+    background-color: #dc3545;
+}
+
+.alphanumOrDate .input:focus-within::after,
+.alphanumOrDate.filled .input::after {
+    transform: scaleX(1);
+}
+
+.alphanumOrDate .inputUnit {
+    display: flex;
+    align-items: center;
+    color: #412205;
+}
+
+.alphanumOrDate .inputValue {
+    flex-grow: 1;
+    padding: 5px 0;
+    border: none;
+    outline: none;
+    background-color: #fff;
+    color: #412205;
+    font: inherit;
+}
+
+.alphanumOrDate .inputValue::placeholder {
     color: #777;
 }
 
-.label {
-    font-weight: bold;
-    text-align: left;
-    margin-bottom: 8px;
+.alphanumOrDate [type="date"]::-webkit-calendar-picker-indicator {
+    position: absolute;
+    top: 0;
+    left: -30px;
+    bottom: 0;
+    right: 0;
+    width: auto;
+    height: auto;
+    cursor: pointer;
+    opacity: 0;
 }
 
-.inputElement {
-    outline:none;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    font: inherit;
-    padding: 6px 10px;
+.alphanumOrDate [type=number]::-webkit-inner-spin-button,
+.alphanumOrDate [type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
-.inputElement:focus{
-    outline: none;
-    background-color: #ccc;
+
+.alphanumOrDate .label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    z-index: 1;
+    text-align: left;
+    pointer-events: none;
+}
+
+.alphanumOrDate.withPrefix .label {
+    left: var(--prefix-width);
+}
+
+.alphanumOrDate .labelValue {
+    position: absolute;
+    left: 0;
+    transform: scale(0.875);
+    transform-origin: left;
+    color: #777;
+    will-change: transform, color;
+    transition: transform .3s ease-in-out, color .3s ease;
+}
+
+.alphanumOrDate.withJumpingLabel .labelValue {
+    /* text inside input is 5px from the bottom border - padding */
+    /* label height is 50px */
+    /* scale 0.875 -> 1 - same outcome as fz 14px to 16px -> 14/16===0.875 */
+    transform: scale(1) translateY(calc(45px - 100%));
+}
+
+.alphanumOrDate:focus-within .labelValue {
+    color: #40a4c8;
+}
+
+.alphanumOrDate:focus-within.invalid .labelValue {
+    color: #dc3545;
+}
+
+.alphanumOrDate.withJumpingLabel:focus-within .labelValue,
+.alphanumOrDate.filled .labelValue {
+    transform: scale(0.875);
+}
+
+.alphanumOrDate.filled:not(:focus-within) .labelValue {
+    color: #412205;
+}
+
+/* checkbox */
+.checkbox {
+    --helper-dimension: 20px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    height: 30px;
+}
+
+.checkbox .inputValue {
+    opacity: 0;
+    position: absolute;
+    top: 5px;
+    left: 0;
+    z-index: 1;
+    width: var(--helper-dimension);
+    height: var(--helper-dimension);
+    border: calc(0.125 * var(--helper-dimension)) solid currentColor;
+    border-radius: calc(0.0625 * var(--helper-dimension));
+    cursor: pointer;
+}
+
+.checkbox .label {
+    padding-left: 30px;
+    cursor: pointer;
+    color: #412205;
+}
+
+.checkbox .helper {
+    position: absolute;
+    top: 5px;
+    left: 0;
+    z-index: 0;
+    width: var(--helper-dimension);
+    height: var(--helper-dimension);
+    border: calc(0.125 * var(--helper-dimension)) solid currentColor;
+    border-radius: calc(0.0625 * var(--helper-dimension));
+    transition: border-color .3s ease;
+}
+
+.checkbox .helper::before,
+.checkbox .helper::after {
+    content: '';
+    display: block;
+    position: absolute;
+    height: 0;
+    width: calc(0.2*var(--helper-dimension));
+    background-color: #40a4c8;
+    border-radius: calc(0.25*var(--helper-dimension));
+    opacity: 0;
+    transform-origin: left top;
+    transition: opacity .3s ease, height 0s linear .3s;
+}
+
+.checkbox .helper::before {
+    top: calc(0.65 * var(--helper-dimension));
+    left: calc(0.38 * var(--helper-dimension));
+    transform: rotate(-135deg);
+    box-shadow: 0 0 0 calc(0.0625 * var(--helper-dimension)) #fff;
+}
+
+.checkbox .helper::after {
+    top: calc(0.3*var(--helper-dimension));
+    left: 0;
+    transform: rotate(-45deg);
+}
+
+.checkbox label:hover~.input .helper,
+.checkbox input:checked~.helper,
+.checkbox input:hover~.helper {
+    color: #40a4c8;
+}
+
+.checkbox input:checked~.helper::after,
+.checkbox input:checked~.helper::before {
+    opacity: 1;
+    transition: height .3s ease;
+}
+
+.checkbox input:checked~.helper::after {
+    height: calc(0.5*var(--helper-dimension));
+}
+
+.checkbox input:checked~.helper::before {
+    height: calc(1.2*var(--helper-dimension));
+    transition-delay: .3s;
 }

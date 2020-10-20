@@ -1,0 +1,8 @@
+.authMissing {
+    text-align: center;
+ }
+ 
+ .authMissing p {
+     padding-top: 20px;
+     text-align: left;
+ }

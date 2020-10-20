@@ -1,24 +1,10 @@
-.auth {
-    margin: 20px auto;
-    width: 80%;
-    text-align: center;
-    padding: 10px;
-    border: 1px solid #eee;
-    box-shadow: 0 2px 3px #ccc;
-}
-.auth h2{
-    margin: 20px 0;
-}
-
-.auth form {
+.authWrapper {
     display: flex;
-    min-height: 200px;
-    justify-content:space-between;
-    flex-direction: column;
+    padding: 20px 0;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 60px);
 }
-
-@media (min-width:600px) {
-    .auth {
-        width: 500px;
-    }
+.errorMessage {
+    color: #dc3545;
 }

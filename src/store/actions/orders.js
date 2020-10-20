@@ -1,9 +1,11 @@
 import * as actionTypes from './actionTypes';
 
-export const filterOrders = (orders, ordersBurgers) => ({
+export const filterOrders = (orders, ordersBurgers, userRole, userId) => ({
     type: actionTypes.FILTER_ORDERS,
     orders,
-    ordersBurgers
+    ordersBurgers,
+    userRole,
+    userId
 })
 export const calculateOrdersStats = () => ({
     type: actionTypes.CALCULATE_ORDERS_STATS
